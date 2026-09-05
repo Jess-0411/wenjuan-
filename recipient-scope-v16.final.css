@@ -1,0 +1,105 @@
+/* Recipient scope V1.6 stable final CSS. Load after all recipient picker styles. */
+.recipient-module-tags > span.scope-recipient {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+}
+
+.recipient-module-tags > span.scope-recipient > .recipient-scope-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recipient-module-tags > span.scope-recipient .recipient-scope-count {
+  display: none !important;
+}
+
+.device-pc .recipient-picker-modal .recipient-parent-row.department-group-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) !important;
+  align-items: center;
+}
+
+.device-pc .recipient-picker-modal .department-group-row > button[data-picker-toggle-department] {
+  grid-column: 1;
+}
+
+.device-pc .recipient-picker-modal .department-group-row > .recipient-department-scope,
+.device-pc .recipient-picker-modal .department-group-row > .recipient-department-label {
+  grid-column: 2;
+}
+
+.recipient-department-scope {
+  display: flex !important;
+  min-width: 0;
+  align-items: center;
+  gap: 11px;
+  cursor: pointer;
+}
+
+.recipient-department-scope.is-disabled,
+.recipient-workgroup-scope.is-disabled {
+  cursor: not-allowed;
+  opacity: .56;
+}
+
+.device-pc .recipient-workgroup-leaf-row {
+  display: grid !important;
+  grid-template-columns: 32px minmax(0, 1fr) !important;
+  align-items: center;
+}
+
+.device-pc .recipient-workgroup-leaf-row > .recipient-workgroup-node {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 9px 0 2px;
+}
+
+.recipient-workgroup-scope {
+  display: grid !important;
+  width: 32px;
+  height: 38px;
+  place-items: center;
+  cursor: pointer;
+}
+
+.device-mobile .mobile-workgroup-leaf-row {
+  display: grid !important;
+  min-height: 52px;
+  grid-template-columns: 42px minmax(0, 1fr) !important;
+  align-items: center;
+}
+
+.device-mobile .mobile-workgroup-leaf-row > .recipient-workgroup-scope {
+  width: 42px;
+  height: 52px;
+}
+
+.device-mobile .mobile-workgroup-leaf-row > .mobile-workgroup-node {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 8px 0 0;
+}
+
+.recipient-workgroup-person,
+.device-mobile .mobile-recipient-child {
+  min-width: 0;
+}
+
+.recipient-other-scope {
+  min-width: 0 !important;
+  max-width: 150px;
+  flex: 0 1 auto;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.device-mobile .recipient-other-scope {
+  max-width: 112px;
+}
