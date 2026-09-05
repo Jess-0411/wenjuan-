@@ -497,7 +497,7 @@
       const value = recipientPersonPickerState('workgroup', person.personId, group?.id || '', state.recipientPickerDraft);
       return `<label class="${mobile ? 'mobile-recipient-child' : 'recipient-workgroup-person'}" data-workgroup-person-row="${person.personId}"><input type="checkbox" data-picker-workgroup-person="${person.personId}" data-picker-person-scope="${group?.id || ''}" ${value.checked ? 'checked' : ''}><span>${esc(person.name)}</span>${otherScopeBadge(value)}</label>`;
     }).join('');
-    return `<div class="recipient-workgroup-panel-head"><div><h4>${esc(group?.name || '工作组')}</h4><span>${allMembers.length} 名可选人员</span></div></div><div class="recipient-picker-filters"><div class="recipient-search-box"><span>⌕</span><input id="recipient-picker-person-search" type="text" maxlength="50" value="${esc(state.recipientPickerPersonSearch)}" placeholder="搜索人员姓名"></div></div><label class="${mobile ? 'mobile-recipient-select-all' : 'recipient-workgroup-select-all'}"><input type="checkbox" data-workgroup-select-all ${scopeState.checked ? 'checked' : ''} ${allMembers.length ? '' : 'disabled'}><span>选择整个工作组</span></label><div class="${mobile ? 'mobile-recipient-list' : 'recipient-workgroup-person-list'}">${rows || (allMembers.length ? '<div class="recipient-filter-empty"><b>未找到符合条件的人员</b><span>请调整人员姓名</span></div>' : '<div class="recipient-filter-empty"><b>该工作组暂无可选人员</b><span>请选择其他工作组</span></div>')}</div>`;
+    return `<div class="recipient-workgroup-panel-head"><div><h4>${esc(group?.name || '工作组')}</h4><span>${allMembers.length} 名可选人员</span></div></div><div class="recipient-picker-filters"><div class="recipient-search-box"><span>⌕</span><input id="recipient-picker-person-search" type="text" maxlength="50" value="${esc(state.recipientPickerPersonSearch)}" placeholder="搜索人员姓名"></div></div><label class="${mobile ? 'mobile-recipient-select-all' : 'recipient-workgroup-select-all'}"><input type="checkbox" data-workgroup-select-all ${scopeState.checked ? 'checked' : ''} ${allMembers.length ? '' : 'disabled'}><span>全选本组</span></label><div class="${mobile ? 'mobile-recipient-list' : 'recipient-workgroup-person-list'}">${rows || (allMembers.length ? '<div class="recipient-filter-empty"><b>未找到符合条件的人员</b><span>请调整人员姓名</span></div>' : '<div class="recipient-filter-empty"><b>该工作组暂无可选人员</b><span>请选择其他工作组</span></div>')}</div>`;
   };
 
   recipientPickerBody = function (category, mobile = false) {
@@ -542,8 +542,8 @@
       const scopeId = state.recipientWorkgroupId;
       const scopeState = recipientScopeState('workgroup', scopeId, state.recipientPickerDraft);
       workgroupAll.checked = scopeState.checked;
-      workgroupAll.indeterminate = scopeState.indeterminate;
-      workgroupAll.setAttribute('aria-checked', scopeState.indeterminate ? 'mixed' : String(scopeState.checked));
+      workgroupAll.indeterminate = false;
+      workgroupAll.setAttribute('aria-checked', String(scopeState.checked));
       workgroupAll.onchange = () => {
         if (workgroupAll.checked) {
           setDraftDynamicScope('workgroup', scopeId, true);
@@ -752,6 +752,7 @@
   PRD_FIELD_GROUPS.recipientPicker = [
     ['范围选择', '部门与非空工作组支持完整范围选择。', 'data-picker-dynamic-scope'],
     ['人员选择', '逐人选择；完整覆盖后自动归一化。', 'setDraftPerson()'],
+    ['工作组全选状态', '仅完整覆盖全部有效成员时“全选本组”显示选中；选择单个或部分成员时保持未选中且不显示半选。', 'recipientScopeState() / bindRecipientPickerControls()'],
     ['确认与取消', 'PC 与移动端共用临时副本；确认提交，取消回滚。', 'commitRecipientPicker()'],
     ['失效校验', '范围缺失、越权或无有效成员时阻止发布。', 'recipientScopeIsInvalid()']
   ];
