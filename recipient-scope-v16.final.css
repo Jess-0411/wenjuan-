@@ -14,13 +14,38 @@
 }
 
 .recipient-module-tags > span.scope-recipient .recipient-scope-count {
-  display: none !important;
+  display: inline-flex !important;
+  min-height: 18px;
+  flex: 0 0 auto;
+  align-items: center;
+  margin-left: 0;
+  padding: 1px 6px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .72);
+  color: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.device-mobile .recipient-department-scope > input:indeterminate,
+.device-mobile .recipient-workgroup-scope > input:indeterminate,
+.device-mobile .mobile-recipient-select-all input:indeterminate {
+  border: 0;
+  background: linear-gradient(#fff, #fff) center / 10px 2px no-repeat, var(--blue);
+}
+
+.portal-school.device-mobile .recipient-department-scope > input:indeterminate,
+.portal-school.device-mobile .recipient-workgroup-scope > input:indeterminate,
+.portal-school.device-mobile .mobile-recipient-select-all input:indeterminate {
+  background: linear-gradient(#fff, #fff) center / 10px 2px no-repeat, var(--green);
 }
 
 .device-pc .recipient-picker-modal .recipient-parent-row.department-group-row {
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr) !important;
   align-items: center;
+  padding-left: calc(4px + var(--department-depth, 0) * 18px);
 }
 
 .device-pc .recipient-picker-modal .department-group-row > button[data-picker-toggle-department] {
@@ -40,49 +65,121 @@
   cursor: pointer;
 }
 
+.recipient-department-scope > input {
+  box-sizing: border-box;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  margin: 0;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+
+.portal-school .recipient-department-scope > input {
+  accent-color: var(--green);
+}
+
 .recipient-department-scope.is-disabled,
-.recipient-workgroup-scope.is-disabled {
+.recipient-department-scope:has(> input:disabled) {
   cursor: not-allowed;
   opacity: .56;
 }
 
-.device-pc .recipient-workgroup-leaf-row {
+.recipient-department-scope > input:disabled {
+  cursor: not-allowed;
+}
+
+.department-group.is-branch .recipient-department-scope {
+  display: none !important;
+}
+
+.recipient-workgroup-scope {
   display: grid !important;
-  grid-template-columns: 32px minmax(0, 1fr) !important;
+  min-width: 28px;
+  align-self: stretch;
+  place-items: center;
+  cursor: pointer;
+}
+
+.recipient-workgroup-scope > input {
+  box-sizing: border-box;
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+
+.portal-school .recipient-workgroup-scope > input {
+  accent-color: var(--green);
+}
+
+.recipient-workgroup-scope.is-disabled,
+.recipient-workgroup-scope:has(> input:disabled) {
+  cursor: not-allowed;
+  opacity: .56;
+}
+
+.device-pc .recipient-workgroup-leaf-row,
+.device-mobile .mobile-workgroup-leaf-row {
+  display: grid !important;
+  grid-template-columns: 30px minmax(0, 1fr) !important;
   align-items: center;
+}
+
+.device-pc .recipient-workgroup-leaf-row {
+  padding-left: calc(var(--tree-depth, 0) * 18px);
 }
 
 .device-pc .recipient-workgroup-leaf-row > .recipient-workgroup-node {
   box-sizing: border-box;
   width: 100%;
-  padding: 0 9px 0 2px;
-}
-
-.recipient-workgroup-scope {
-  display: grid !important;
-  width: 32px;
-  height: 38px;
-  place-items: center;
-  cursor: pointer;
+  padding: 0 9px 0 4px;
 }
 
 .device-mobile .mobile-workgroup-leaf-row {
-  display: grid !important;
   min-height: 52px;
-  grid-template-columns: 42px minmax(0, 1fr) !important;
-  align-items: center;
-}
-
-.device-mobile .mobile-workgroup-leaf-row > .recipient-workgroup-scope {
-  width: 42px;
-  height: 52px;
+  padding-left: calc(var(--tree-depth, 0) * 18px);
 }
 
 .device-mobile .mobile-workgroup-leaf-row > .mobile-workgroup-node {
   box-sizing: border-box;
   width: 100%;
   min-height: 52px;
-  padding: 0 8px 0 0;
+  padding: 0 8px 0 4px;
+}
+
+.device-mobile .mobile-recipient-row.department-group-row {
+  padding-left: calc(6px + var(--department-depth, 0) * 16px);
+}
+
+.recipient-picker-modal .department-group-row > button[data-picker-toggle-department] {
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.recipient-picker-modal .department-group-row > .recipient-department-label,
+.recipient-picker-modal .department-group-row > .recipient-department-scope,
+.recipient-picker-modal .department-group-row b,
+.recipient-picker-modal .department-group-row small {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.recipient-picker-modal .department-group-row b,
+.recipient-picker-modal .department-group-row small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recipient-result-select-all > span,
+.mobile-recipient-select-all > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .recipient-workgroup-person,

@@ -1,0 +1,86 @@
+/* Dynamic department and workgroup recipient visuals V1.7. */
+.recipient-module-tags > span.scope-recipient {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+}
+
+.recipient-module-tags > span.scope-recipient > .recipient-scope-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recipient-module-tags > span.scope-recipient .recipient-scope-count {
+  display: inline-flex !important;
+  min-height: 18px;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .72);
+  color: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+html body .recipient-workgroup-scope {
+  display: grid !important;
+  min-width: 28px;
+  align-self: stretch;
+  place-items: center;
+  cursor: pointer;
+}
+
+.recipient-workgroup-scope > input {
+  box-sizing: border-box;
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+
+.portal-school .recipient-workgroup-scope > input {
+  accent-color: var(--green);
+}
+
+.recipient-workgroup-scope.is-disabled,
+.recipient-workgroup-scope:has(> input:disabled) {
+  cursor: not-allowed;
+  opacity: .56;
+}
+
+.device-pc .recipient-workgroup-leaf-row,
+.device-mobile .mobile-workgroup-leaf-row {
+  display: grid !important;
+  grid-template-columns: 30px minmax(0, 1fr) !important;
+  align-items: center;
+}
+
+.device-pc .recipient-workgroup-leaf-row {
+  padding-left: calc(var(--tree-depth, 0) * 18px);
+}
+
+.device-pc .recipient-workgroup-leaf-row > .recipient-workgroup-node,
+.device-mobile .mobile-workgroup-leaf-row > .mobile-workgroup-node {
+  box-sizing: border-box;
+  width: 100%;
+  padding-left: 4px;
+}
+
+.device-mobile .recipient-department-scope > input:indeterminate,
+.device-mobile .recipient-workgroup-scope > input:indeterminate,
+.device-mobile .mobile-recipient-select-all input:indeterminate {
+  border: 0;
+  background: linear-gradient(#fff, #fff) center / 10px 2px no-repeat, var(--blue);
+}
+
+.portal-school.device-mobile .recipient-department-scope > input:indeterminate,
+.portal-school.device-mobile .recipient-workgroup-scope > input:indeterminate,
+.portal-school.device-mobile .mobile-recipient-select-all input:indeterminate {
+  background: linear-gradient(#fff, #fff) center / 10px 2px no-repeat, var(--green);
+}
