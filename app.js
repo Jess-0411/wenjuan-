@@ -2042,16 +2042,16 @@ const PRD_V16_PROFILES={
   features:[
     ['数据统计','四项卡片','详情稳定展示已提交、未提交、外部提交数、完成率；纯外部问卷依次显示 0、“—”、N、“—”，PC 四列、移动端 2×2。','P0','无任务日期时展示整块空态'],
     ['统计口径','内外部分离','已提交和未提交只计算内部接收人员；外部提交数单独统计有效外部答卷份数；完成率只按内部提交进度计算。','P0','内部应提交为 0 时不计算完成率'],
-    ['提示说明','可访问提示','四项指标均显示可聚焦提示图标；PC 悬浮或聚焦，移动端点击或聚焦展示指定文案。','P0','文案不得改写'],
+    ['提示说明','详情页提示','统计列表不显示提示图标；进入统计详情后四项指标显示可聚焦提示图标，PC 悬浮或聚焦、移动端点击或聚焦展示指定文案。','P0','文案不得改写'],
    ['每日统计','日期联动','默认昨天，无昨日任务回退最近任务日；切换后联动指标、明细、下载和题目统计。','P0','未来日期不可选'],
    ['人员明细','仅内部可见','已提交明细和下载仅含内部人员；存在外部提交时展示不可查看提示。','P0','外部明细路由拒绝'],
    ['题目统计','按题型展示','全部七种题型使用对应统计视图；标题下方不展示解释性文字。','P0','无任务显示空态']
   ],
   flow:'从统计列表或问卷管理进入统计详情；普通问卷加载累计快照，每日问卷确定默认日期。用户切换日期或题目后刷新同一快照下全部数据；进入人员明细时仅加载内部人员记录。',
    exceptions:'没有可统计任务日时整块展示空态并禁用明细；应提交内部人数为零时已提交显示 0，未提交和完成率均为“—”；外部提交不得生成可访问人员详情；拆分字段均缺失的旧混合问卷沿用旧口径归入内部。',
-   data:'已提交=internalDone；未提交=max(0,internalTotal-internalDone)；外部提交数=externalDone；完成率=round(internalDone÷(internalDone+pending)×100%)，internalTotal=0 时为 null 并映射为“—”。statsSnapshot.submitted 保留内外部合计语义供题目统计兼容。每日日期状态按 surveyId 保存。记录 stats_date_change、stats_detail_open、stats_people_open、stats_download、stats_tip_open；【假设】公共属性包含 survey_id、stats_date、internal_done、external_done、submitted、internal_total、rate、timestamp。',
+   data:'已提交=internalDone；未提交=max(0,internalTotal-internalDone)；外部提交数=externalDone；完成率=round(internalDone÷(internalDone+pending)×100%)，internalTotal=0 时为 null 并映射为“—”。statsSnapshot.submitted 保留内外部合计语义供题目统计兼容。每日日期状态按 surveyId 保存。记录 stats_date_change、stats_detail_open、stats_people_open、stats_download；仅统计详情记录 stats_tip_open。【假设】公共属性包含 survey_id、stats_date、internal_done、external_done、submitted、internal_total、rate、timestamp。',
   risks:'正式环境须保证指标、明细、下载和题目聚合来自同一统计快照；外部人员无稳定身份时不得提供明细；业务时区和任务生成日必须统一。',
-   acceptance:'纯内部、混合和纯外部问卷的四项统计与计算正确；纯外部显示 0、—、N、—；混合问卷的已提交和完成率不包含外部提交；四项提示文案完全一致；外部提交不出现在明细和下载；每日默认日期、回退和整页联动正确。'
+   acceptance:'纯内部、混合和纯外部问卷的四项统计与计算正确；纯外部显示 0、—、N、—；混合问卷的已提交和完成率不包含外部提交；移动端统计列表无提示图标，进入统计详情后四项提示文案完全一致；外部提交不出现在明细和下载；每日默认日期、回退和整页联动正确。'
  },
  statsActions:{
   users:'问卷发布人在移动端统计详情中，根据问卷实时状态执行可用的管理操作。',
