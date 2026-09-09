@@ -81,7 +81,7 @@ function installDemoCoverageData(){
  });
 }
 installDemoCoverageData();
-const state={portal:null,page:'list',listView:'received',listFilters:{title:'',owner:'',type:'',status:''},allSurveyFilters:{title:'',owner:'',start:'',end:'',status:''},pagination:{},pageSizes:{},templateFilters:{name:'',type:'all'},templateSelectOpen:false,templateSelectFilters:{name:'',type:'all'},selectedTemplateId:null,createSurveyMenuOpen:false,surveyTypeKeyword:'',questions:[],questionMenu:-1,questionError:-1,step:1,draftTitle:'',draftDescription:'',draftSurveyTypeId:'',draftSurveyTypeName:'',preserveSurveyTypeSnapshot:false,editingSurveyId:null,recipients:new Map(),recipientTab:'',recipientReturnPage:'',recipientExpansion:new Map(),recipientSearch:'',recipientSchoolType:'',externalRecipient:false,frequency:'single',startDate:collectionDefaultDate(),endDate:collectionDefaultDate(7),allowModify:true,dailyReminder:false,skipNonWorkday:false,reminderTime:'',channel:'internal',responseSelection:{},openQuestion:1,pcStatsQuestion:0,textAnswerViews:{},statsBack:'#all-surveys',surveyDetailBack:'#all-surveys',statsDateBySurvey:{},preview:'pc',mobileFilter:'all',mobileQuestionPicker:false,mobileSettingsSheet:'',mobileTemplateType:'all',mobileTemplateTypeOpen:false,templateTypeFilter:'all',editingSurveyTemplateId:null,mobileAnswers:{},mobileWidgetReturn:null,resourceCenterEnabled:true,attachmentSelections:{},resourceSpace:'school',resourceFolderId:'',resourceFolderName:'',resourceReturnPage:'',saveScenario:'success',saveJob:null};
+const state={portal:null,page:'list',listView:'received',listFilters:{title:'',owner:'',type:'',status:''},allSurveyFilters:{title:'',owner:'',start:'',end:'',status:''},pagination:{},pageSizes:{},templateFilters:{name:'',type:'all'},templateSelectOpen:false,templateSelectFilters:{name:'',type:'all'},selectedTemplateId:null,createSurveyMenuOpen:false,surveyTypeKeyword:'',questions:[],questionMenu:-1,step:1,draftTitle:'',draftDescription:'',draftSurveyTypeId:'',draftSurveyTypeName:'',preserveSurveyTypeSnapshot:false,editingSurveyId:null,recipients:new Map(),recipientTab:'',recipientReturnPage:'',recipientExpansion:new Map(),recipientSearch:'',recipientSchoolType:'',externalRecipient:false,frequency:'single',startDate:collectionDefaultDate(),endDate:collectionDefaultDate(7),allowModify:false,dailyReminder:false,skipNonWorkday:false,reminderTime:'',channel:'internal',responseSelection:{},openQuestion:1,pcStatsQuestion:0,textAnswerViews:{},statsBack:'#all-surveys',surveyDetailBack:'#all-surveys',statsDateBySurvey:{},preview:'pc',mobileFilter:'all',mobileQuestionPicker:false,mobileSettingsSheet:'',mobileTemplateType:'all',mobileTemplateTypeOpen:false,templateTypeFilter:'all',editingSurveyTemplateId:null,mobileAnswers:{},mobileWidgetReturn:null,resourceCenterEnabled:true,attachmentSelections:{},resourceSpace:'school',resourceFolderId:'',resourceFolderName:'',resourceReturnPage:'',saveScenario:'success',saveJob:null};
 const RESOURCE_FOLDERS={
  school:[
   {id:'school-teaching',name:'教学教研',writable:true,children:[{id:'school-evaluation',name:'教学评价',writable:true},{id:'school-assets',name:'校本资源',writable:true},{id:'school-research',name:'教研活动',writable:true},{id:'school-course',name:'课程教学',writable:true,children:[{id:'school-courseware',name:'课件',writable:true},{id:'school-courseware-1111',name:'1111',writable:true}]}]},
@@ -170,7 +170,7 @@ const PRD_FIELD_GROUPS={
   ['问卷名称','选填；最多 50 个字符；输入即筛选；去除首尾空格。','state.listFilters.title / data-title'],['创建人','选填；最多 50 个字符；输入即筛选；去除首尾空格。','state.listFilters.owner / data-owner'],['问卷类型','选填；从当前组织有效类型中单选。','state.listFilters.type / data-type'],['问卷状态','选填；我收到的仅包含进行中、已暂停、已结束；我发布的包含草稿、未开始、进行中、已暂停、已结束。','state.listFilters.status / data-status']
  ],
  surveyList:[
-  ['问卷名称','只读；空值显示“—”。','CONFIG[state.portal].surveys[].title'],['问卷类型','只读；优先展示创建或主动改选时固化的 surveyTypeName 历史快照，不随类型改名或删除变化。','surveyTypeLabel(s) / surveyTypeName'],['发送人数','内部问卷展示实时解析的有效接收人数；公开/二维码问卷展示“—”。','sentCount(s) / syncDynamicSurveyRecipientTotal(s)'],['提交人数','无值按 0 展示；已提交人员退出范围后仍保留。','submittedCount(s)'],['状态','展示状态文案与颜色标签。','s.status / s.statusText'],['填写状态','仅我收到的展示未填写或已填写；未提交成功前统一为未填写。','fillStatusKey(s)'],['创建人/时间','只读；时间精确到秒。','s.owner / s.createdAt'],['操作','草稿与已暂停支持删除；未开始、进行中与已结束不展示删除入口。','receivedActions(s) / publishedActions(s)']
+  ['问卷名称','只读；空值显示“—”。','CONFIG[state.portal].surveys[].title'],['问卷类型','只读；优先展示创建时固化的 surveyTypeName 历史快照，不随类型改名或删除变化。','surveyTypeLabel(s) / surveyTypeName'],['发送人数','内部问卷展示实时解析的有效接收人数；公开/二维码问卷展示“—”。','sentCount(s) / syncDynamicSurveyRecipientTotal(s)'],['提交人数','无值按 0 展示；已提交人员退出范围后仍保留。','submittedCount(s)'],['状态','展示状态文案与颜色标签。','s.status / s.statusText'],['填写状态','仅我收到的展示未填写或已填写；未提交成功前统一为未填写。','fillStatusKey(s)'],['创建人/时间','只读；时间精确到秒。','s.owner / s.createdAt'],['操作','已有问卷统一提供“查看”，不提供编辑或修改入口；草稿与已暂停仍按状态支持删除。','receivedActions(s) / publishedActions(s)']
  ],
  response:[
   ['题目答案','按问卷实际题目采集；必答项无有效值时阻止提交。','surveyAnswerFields() / collectSurveyAnswers()'],['PC 签名区域','未签名前中间区域保持空白，右下角固定显示“签名”操作按钮；确认后回显本次签字并显示“重新签名”。','pcSignatureInput()'],['PC 签名确认','点击“签名”按钮打开空白确认签字弹窗；仅点击确认签名后写入本次答卷。','openPcSignatureModal() / PC_SIGNATURE_ASSETS'],['签名取消','关闭按钮、遮罩或 Escape 丢弃弹窗工作副本，清空只作用于弹窗画布。','openPcSignatureModal()'],['提交时间/答卷编号','只读；提交时间精确到秒，历史按时间倒序；新增答卷保存 personId。','responseTimestamp() / responseRecords(s)'],['提交后状态','答卷提交成功后永久只读；签名按图片回显，不输出原始签名令牌。','responseDetailPage() / responseAnswerMarkup()']
@@ -181,8 +181,7 @@ const PRD_FIELD_GROUPS={
  surveyDetail:[
   ['问卷标题/类型/状态','只读；类型展示 surveyTypeName 历史快照，类型改名或删除后仍保持原值；问卷已删除或越权时展示不可用空态。','s.title / surveyTypeLabel(s) / s.status / s.statusText'],
   ['创建人员/时间','只读；创建时间精确到秒。','s.owner / s.createdAt'],
-  ['接收人员','只读；展示发布时保存的人员及动态范围摘要。','s.target / s.recipientSnapshot'],
-  ['数据范围','按实际接收分类去重并按固定顺序组合；详情不展示发布渠道。','surveyDataScope(s) / s.recipientSnapshot / s.allowExternal / s.channel'],
+  ['接收人员','只读；完整展示发布时选择的人员姓名或范围名称，开启外部填写时追加“外部人员”；全部名称自动换行且不折叠。','surveyRecipientDisplayNames(s) / surveyRecipientItems(s) / s.target'],
   ['发送人数','动态范围按当前有效内部人员实时解析，并与已有内部答卷人员合并。','syncDynamicSurveyRecipientTotal(s)'],
   ['已提交','仅统计内部接收人员的有效提交人数，不包含外部人员提交。','statsSnapshot(s).internalDone'],
   ['未提交','max(0，应提交内部人数 - 内部有效提交数)；不计外部人员；纯外部显示“—”。','statsSnapshot(s).pending'],
@@ -191,7 +190,7 @@ const PRD_FIELD_GROUPS={
   ['题目列表','优先使用问卷题目结构，否则使用演示题目。','surveyDetailQuestions(s) / surveyQuestions(s)']
  ],
  createBasic:[
-  ['问卷标题','必填；1～50 个字符；去除首尾空格；为空提示“请输入问卷标题”。','state.draftTitle'],['问卷类型','新建时必选当前有效类型并同时固化 ID 与名称；编辑既有问卷默认保留原快照，主动选择有效类型后更新两项快照。','state.draftSurveyTypeId / state.draftSurveyTypeName / state.preserveSurveyTypeSnapshot'],['问卷说明','选填；最多 500 个字符；去除首尾空格。','基础信息表单输入'],['当前步骤','只读；基础信息为第 1 步。','state.step']
+  ['问卷标题','必填；1～50 个字符；去除首尾空格；为空提示“请输入问卷标题”。','state.draftTitle'],['问卷类型','新建时必选当前有效类型并同时固化 ID 与名称；创建后仅支持查看，不再提供改选或修改。','state.draftSurveyTypeId / state.draftSurveyTypeName'],['问卷说明','选填；最多 500 个字符；去除首尾空格。','基础信息表单输入'],['当前步骤','只读；基础信息为第 1 步。','state.step']
  ],
  templateBasic:[
   ['模板名称','必填；1～50 个字符；去除首尾空格；为空提示“请输入模板名称”。','state.draftTitle'],['问卷类型','模板仅保存当前有效 surveyTypeId；类型删除后置空，编辑时必须重新选择有效类型方可保存。','state.draftSurveyTypeId / SURVEY_TEMPLATE_STORE[].surveyTypeId'],['问卷说明','选填；最多 500 个字符；去除首尾空格。','基础信息表单输入'],['当前步骤','只读；基础信息为第 1 步。','state.step']
@@ -231,7 +230,7 @@ const PRD_FIELD_GROUPS={
   ['姓名','必填；1～20 个字符；去除首尾空格。','state.mobileAnswers[surveyId].name'],['性别','必填；男、女二选一。','state.mobileAnswers[surveyId].gender'],['微信号','选填；6～20 个字符；字母开头，仅字母、数字、下划线、连字符。','state.mobileAnswers[surveyId].wechat'],['QQ号','选填；5～12 位数字。','state.mobileAnswers[surveyId].qq'],['只读状态','已提交答卷禁用全部填写字段，仅支持查看，不展示修改按钮。','s.fillStatus === submitted']
  ],
  mobileCreate:[
-  ['问卷标题','必填；1～50 个字符；去除首尾空格。','state.draftTitle'],['问卷类型','新建时必选有效类型并固化 ID 与名称；编辑历史问卷默认保留原类型快照，主动改选后更新快照。','state.draftSurveyTypeId / state.draftSurveyTypeName / surveyTypeDraftOptions()'],['填写描述','选填；最多 500 个字符。','mobile-description 输入'],['题目列表','1～100 题；标题与类型来自 state.questions。','state.questions[]']
+  ['问卷标题','必填；1～50 个字符；去除首尾空格。','state.draftTitle'],['问卷类型','新建时必选有效类型并固化 ID 与名称；创建后仅支持查看，不再提供改选或修改。','state.draftSurveyTypeId / state.draftSurveyTypeName'],['填写描述','选填；最多 500 个字符。','mobile-description 输入'],['题目列表','1～100 题；标题与类型来自 state.questions。','state.questions[]']
  ],
  pagination:[
   ['每页展示条数','仅 PC 列表展示；可选 10、20、50、100 条，默认 10 条。','PAGE_SIZE_OPTIONS / pageSizeFor(key)'],['移动端列表','不展示页码、上一页或下一页控件；当前筛选结果一次性展示，底部仅保留记录数。','paginateItems() / paginationComponent()'],['状态隔离','PC 端按当前端和列表标识独立记忆；“我的问卷”中“我收到的”和“我发布的”分别记录；仅本次应用打开期间有效。','state.pageSizes[paginationStateKey(key)]'],['切换规则','PC 切换条数后回到第 1 页并重新计算总页数；筛选条件保持不变，后续筛选仅重置页码。','setPageSize() / paginateItems()']
@@ -251,7 +250,7 @@ const PRD_PAGE_RULES={
  'list-response':{title:'本人答卷',goal:'查看当前用户的有效答卷及历次提交记录。',fields:prdFields('surveyList','response')},
  'list-fill':{title:'填写答卷',goal:'新增并提交一份答卷，提交成功后仅支持查看。',fields:prdFields('response')},
  'all-surveys':{title:'问卷管理',goal:'查看当前组织内所有已发布且未删除的问卷；草稿仅在“我的问卷”中展示。',fields:prdFields('allSurveyFilters','surveyList','pagination')},
- 'all-surveys-detail':{title:'问卷详情',goal:'只读查看问卷配置、接收范围和答卷明细。',fields:prdFields('surveyDetail').filter(row=>!['发送/提交/未提交','完成率'].includes(row[0]))},
+ 'all-surveys-detail':{title:'问卷详情',goal:'只读查看问卷配置、接收人员和答卷明细。',fields:prdFields('surveyDetail').filter(row=>!['发送/提交/未提交','完成率'].includes(row[0]))},
  'create-basic':{title:'创建问卷｜基础信息',goal:'录入问卷标题与填写说明。',fields:prdFields('createBasic')},
  'create-editor':{title:'创建问卷｜问卷设计',goal:'添加、排序和配置问卷题目。',fields:prdFields('createEditor')},
  'create-recipients':{title:'创建问卷｜接收人员',goal:'选择问卷的内部接收对象。',fields:prdFields('recipients')},
@@ -268,7 +267,7 @@ const PRD_PAGE_RULES={
  'stats-save-folder':{title:'保存到文件夹',goal:'在移动端从学校资源或我的资源中选择可写文件夹，并提交附件批量保存任务。',fields:prdFields('resourceCenter')},
  'stats-people':{title:'填写明细',goal:'查看并下载已提交或未提交人员明细。',fields:prdFields('stats')},
  'mobile-fill-list':{title:'移动端填写列表',goal:'按填写状态查看当前用户收到的问卷。',fields:prdFields('surveyList')},
- 'mobile-form':{title:'移动端问卷填写',goal:'填写、查看或修改当前问卷答卷。',fields:prdFields('mobileAnswer')},
+ 'mobile-form':{title:'移动端问卷填写',goal:'填写新答卷或只读查看已经提交的问卷答卷。',fields:prdFields('mobileAnswer')},
  'mobile-complete':{title:'移动端提交完成',goal:'确认答卷已提交并进入提交结果查看。',fields:prdFields('mobileAnswer')},
  'mobile-templates':{title:'移动端模板选择',goal:'按问卷类型筛选模板或自定义创建。',fields:prdFields('templates','surveyTypes')},
  'mobile-create':{title:'移动端创建问卷',goal:'录入基础信息并添加问卷题目。',fields:prdFields('mobileCreate','createEditor')},
@@ -326,16 +325,16 @@ function prdTable(headers,rows,klass='',highlightPrefix=''){
 }
 function renderPrdDocument(rule,key,entryType){
  if(entryType==='page'&&(key==='cloud-widget'||key==='mobile-widget'))return renderCloudWidgetPrd(rule,key);
-	 const isRecipientSelector=entryType==='page'&&['create-recipients','mobile-recipients'].includes(key),isCollectionSettings=(entryType==='page'&&['create-publish','mobile-settings'].includes(key))||(entryType==='overlay'&&key==='settings-choice'),isSurveyManagement=entryType==='page'&&key==='list',isSurveyTypes=entryType==='page'&&key==='survey-types',featureRows=prdFeatureRows(rule);if(isRecipientSelector)featureRows.push(['部门与工作组','动态范围','部门及具有直接成员的工作组叶节点可直接勾选；纯目录节点仅用于展开。','P0','PC与移动端一致'],['成员联动','范围转人员与去重','取消动态范围中的成员后转为其余明确人员；搜索不缩小范围，所有人员按personId去重。','P0','逐人选满不自动升级'],['发布范围','保留动态对象','发布时保留 department/workgroup dynamic scope，填写与统计时按当前有效成员实时解析。','P0','旧人员快照继续兼容']);if(isCollectionSettings)featureRows.push(['收集设置','字段统一','PC 与移动端按统一顺序配置外部填写、收集方式、开始日期、截止日期及每日收集规则；非每日方式隐藏三项每日配置。','P0','PC 使用宽屏布局，移动端使用单行列表'],['收集方式','状态联动','非每日方式隐藏并清空每日配置；首次切换每日收集时使用 false、true、09:15，关闭提醒后隐藏并清空时间。','P0','问卷创建与编辑共用规范化逻辑'],['发布范围','纯外部发布','外部填写开启后允许不选择内部接收人员；内部范围与外部填写均为空时阻止发布。','P0','allowExternal 共用'],['问卷状态','日期自动计算','按北京时间日期边界计算未开始、进行中和已结束；暂停及手动结束遵循状态优先级。','P0','历史缺失日期的数据不强制改写']);if(isSurveyManagement)featureRows.push(['状态操作','操作矩阵','草稿提供编辑、删除；未开始提供查看、编辑；进行中提供统计、适用时二维码、暂停、结束；已暂停在此基础上提供恢复和删除；已结束仅保留统计及适用二维码。','P0','仅草稿与已暂停可删除'],['问卷编辑','原记录更新','草稿与未开始问卷按四步流程完整回填；保存或发布沿用原问卷 ID，不新增重复记录。','P0','状态变化时拒绝保存'],['问卷删除','确认与软删除','草稿或已暂停问卷经二次确认后软删除，并从我的问卷、问卷管理、统计及首页数据源移除。','P0','未开始、进行中、已结束不可删除']);if(isSurveyTypes)featureRows.push(['系统预置类型','精简展示','类型名称不展示来源标识，操作单元格保持为空。','P0','底层仍禁止编辑、删除'],['创建时间','首次打开时间','系统预置类型显示浏览器长期保存的应用首次打开时间；自定义类型显示实际新增时间。','P0','教育局端与学校端同源共享']);
+	 const isRecipientSelector=entryType==='page'&&['create-recipients','mobile-recipients'].includes(key),isCollectionSettings=(entryType==='page'&&['create-publish','mobile-settings'].includes(key))||(entryType==='overlay'&&key==='settings-choice'),isSurveyManagement=entryType==='page'&&['list','all-surveys'].includes(key),isSurveyTypes=entryType==='page'&&key==='survey-types',featureRows=prdFeatureRows(rule);if(isRecipientSelector)featureRows.push(['部门与工作组','动态范围','部门及具有直接成员的工作组叶节点可直接勾选；纯目录节点仅用于展开。','P0','PC与移动端一致'],['成员联动','范围转人员与去重','取消动态范围中的成员后转为其余明确人员；搜索不缩小范围，所有人员按personId去重。','P0','逐人选满不自动升级'],['发布范围','保留动态对象','发布时保留 department/workgroup dynamic scope，填写与统计时按当前有效成员实时解析。','P0','旧人员快照继续兼容']);if(isCollectionSettings)featureRows.push(['收集设置','字段统一','PC 与移动端按统一顺序配置外部填写、收集方式、开始日期、截止日期及每日收集规则；非每日方式隐藏三项每日配置。','P0','PC 使用宽屏布局，移动端使用单行列表'],['收集方式','状态联动','非每日方式隐藏并清空每日配置；首次切换每日收集时使用 false、true、09:15，关闭提醒后隐藏并清空时间。','P0','仅用于新建问卷'],['发布范围','纯外部发布','外部填写开启后允许不选择内部接收人员；内部范围与外部填写均为空时阻止发布。','P0','allowExternal 共用'],['问卷状态','日期自动计算','按北京时间日期边界计算未开始、进行中和已结束；暂停及手动结束遵循状态优先级。','P0','历史缺失日期的数据不强制改写']);if(isSurveyManagement)featureRows.push(['问卷查看','统一只读','已有问卷无论状态和设备均只提供只读查看，不渲染编辑或修改入口。','P0','PC与移动端一致'],['路由拦截','旧编辑地址','直接访问历史编辑地址时自动进入只读详情，不加载可编辑表单。','P0','原数据保持不变'],['问卷删除','确认与软删除','草稿或已暂停问卷经二次确认后软删除，并从我的问卷、问卷管理、统计及首页数据源移除。','P0','删除属于生命周期操作']);if(isSurveyTypes)featureRows.push(['系统预置类型','精简展示','类型名称不展示来源标识，操作单元格保持为空。','P0','底层仍禁止编辑、删除'],['创建时间','首次打开时间','系统预置类型显示浏览器长期保存的应用首次打开时间；自定义类型显示实际新增时间。','P0','教育局端与学校端同源共享']);
  const features=prdTable(['功能模块','功能点','需求描述','优先级（P0 / P1 / P2）','备注说明'],featureRows);
  const isStatsDetail=entryType==='page'&&key==='stats-detail';
  const fields=prdTable(['字段/信息','限制与展示规则','当前原型来源'],rule.fields||[],'prd-field-table',isStatsDetail?'能力入口':'');
 	 const prerequisite=isStatsDetail?`<aside class="prd-prerequisite" role="note"><strong>资源中心能力展示前置条件</strong><p>仅当当前页面为学校端、问卷调研字段为文件/图片，且学校云平台返回资源中心应用已开启时，PC 端与移动端才展示附件选择框、全选及“另存为”操作模块；教育局端、普通题型、资源中心未开启、检测失败或状态不可用时均不展示。</p><small>【假设】开通状态由学校云平台提供；前端隐藏不能替代服务端保存时的授权与目录写入权限复核。</small></aside>`:isRecipientSelector?`<aside class="prd-prerequisite" role="note"><strong>动态接收范围口径</strong><p>部门和具有直接成员的工作组叶节点可保存为 dynamic scope；填写、人数及统计按当前有效且 canReceive=true 的成员实时解析。</p><small>范围与明确人员均按 personId 去重；空范围和纯目录节点不可勾选。</small></aside>`:'';
-	 const flowText=isRecipientSelector?'进入部门或工作组分类后，可直接勾选动态范围，也可独立展开或进入成员页逐人选择；范围内取消成员时转换为其余当前人员，确认提交临时副本，取消或返回回滚。':isCollectionSettings?'移动端按“问卷编辑→接收人员→收集设置→发布”执行，PC 端第四步同为收集设置；开启外部填写后使用统一 allowExternal 字段。非每日方式隐藏三项每日配置并保持 false、false、空；从非每日切换为每日时显示非工作日和每日提醒，默认 false、true、09:15；关闭每日提醒时隐藏提醒时间并清空，重新开启时恢复 09:15；切回非每日方式时再次隐藏并清空。发布时校验日期及接收范围，并按北京时间计算初始状态。':isSurveyManagement?'当前用户进入“我发布的”，系统按问卷实时状态输出操作项；草稿与未开始可进入四步编辑流程，删除仅对草稿和已暂停问卷开放并要求二次确认。':'进入当前界面后按字段规则展示或录入数据；操作按钮根据当前状态生效；离开、取消或关闭时遵循原业务流程。';
-	 const exceptionText=isRecipientSelector?'空部门、空工作组和纯目录节点不可勾选；搜索无结果展示空态且不改变已选范围；停用、离职或无接收权限人员不参与解析；失效范围在草稿中提示重新选择并阻止发布。':isCollectionSettings?'开始日期或截止日期为空时阻止发布并定位错误提示；截止日期早于开始日期时阻止发布；每日提醒开启但提醒时间为空时阻止发布；内部接收范围与外部填写均为空时阻止发布。历史问卷缺少日期时保留原状态。':isSurveyManagement?'问卷不存在、已删除、非当前创建人或状态已变化时阻止操作；删除确认回调再次校验状态，仅草稿或已暂停可继续；编辑期间问卷自动开始时拒绝保存，原数据保持不变。':'无权限、数据不存在或已删除时展示空态；非法输入阻止提交并给出明确提示；动态 ID 不改变本规则的字段口径。';
-	 const dataText=isRecipientSelector?'动态范围键为 department:scope:{departmentId} 或 workgroup:scope:{workgroupId}；填写、人数和统计读取时按当前有效成员解析，并与已有答卷人员按personId取并集。记录recipient_scope_select、recipient_scope_unselect、recipient_scope_convert_to_people、recipient_scope_invalid及人员选择、搜索、确认、取消事件。':isCollectionSettings?'保存 startDate、endDate、allowExternal、frequency、skipNonWorkday、dailyReminder、reminderTime；问卷新建及编辑保存前统一规范化每日配置：frequency 非 daily 时保存 false、false、空，提醒关闭时 reminderTime 保存为空。新建或编辑问卷统一保存 allowModify=false，答卷提交成功后永久只读。状态值为 not_started、running、paused、ended；仅 running 计入进行中问卷。记录 recipient_publish_validation_failed，并在正式实现补充 collection_setting_change、survey_publish 与 survey_status_auto_changed。【假设】公共参数包含 portal、device、survey_id、field_name、status、start_date、end_date 和 timestamp。':isSurveyTypes?'系统预置类型的 source 保留为 system；创建时间读取 localStorage 键 survey-app-first-opened-at-v1。自定义类型继续在新增时写入实际 createdAt。打开、关闭分别记录 prd_rule_open、prd_rule_close。':'字段来源以上表为准。打开、关闭分别记录 prd_rule_open、prd_rule_close，公共参数包含 portal、device、page_key、overlay_key、entry_type 和 timestamp。';
+	 const flowText=isRecipientSelector?'进入部门或工作组分类后，可直接勾选动态范围，也可独立展开或进入成员页逐人选择；范围内取消成员时转换为其余当前人员，确认提交临时副本，取消或返回回滚。':isCollectionSettings?'移动端按“问卷编辑→接收人员→收集设置→发布”完成新建问卷，PC 端第四步同为收集设置；开启外部填写后使用统一 allowExternal 字段。非每日方式隐藏三项每日配置并保持 false、false、空；从非每日切换为每日时显示非工作日和每日提醒，默认 false、true、09:15；关闭每日提醒时隐藏提醒时间并清空，重新开启时恢复 09:15；切回非每日方式时再次隐藏并清空。发布时校验日期及接收范围，并按北京时间计算初始状态。':isSurveyManagement?'用户在 PC 或移动端进入已有问卷时只进入只读详情；列表不展示编辑或修改入口，旧编辑地址同样改为只读查看。':'进入当前界面后按字段规则展示或录入数据；操作按钮根据当前状态生效；离开、取消或关闭时遵循原业务流程。';
+	 const exceptionText=isRecipientSelector?'空部门、空工作组和纯目录节点不可勾选；搜索无结果展示空态且不改变已选范围；停用、离职或无接收权限人员不参与解析；失效范围在草稿中提示重新选择并阻止发布。':isCollectionSettings?'开始日期或截止日期为空时阻止发布并定位错误提示；截止日期早于开始日期时阻止发布；每日提醒开启但提醒时间为空时阻止发布；内部接收范围与外部填写均为空时阻止发布。历史问卷缺少日期时保留原状态。':isSurveyManagement?'问卷不存在、已删除或无查看权限时展示空态；构造编辑路由、恢复旧链接或切换设备均不得加载可编辑表单，原数据保持不变。':'无权限、数据不存在或已删除时展示空态；非法输入阻止提交并给出明确提示；动态 ID 不改变本规则的字段口径。';
+	 const dataText=isRecipientSelector?'动态范围键为 department:scope:{departmentId} 或 workgroup:scope:{workgroupId}；填写、人数和统计读取时按当前有效成员解析，并与已有答卷人员按personId取并集。记录recipient_scope_select、recipient_scope_unselect、recipient_scope_convert_to_people、recipient_scope_invalid及人员选择、搜索、确认、取消事件。':isCollectionSettings?'新建问卷保存 startDate、endDate、allowExternal、frequency、skipNonWorkday、dailyReminder、reminderTime；frequency 非 daily 时保存 false、false、空，提醒关闭时 reminderTime 保存为空。问卷统一保存 allowModify=false，答卷提交成功后永久只读。状态值为 not_started、running、paused、ended；仅 running 计入进行中问卷。记录 recipient_publish_validation_failed，并在正式实现补充 collection_setting_change、survey_publish 与 survey_status_auto_changed。【假设】公共参数包含 portal、device、survey_id、field_name、status、start_date、end_date 和 timestamp。':isSurveyManagement?'已有问卷读取配置快照并以只读结构展示，不提供更新接口；记录 survey_view，不记录 survey_edit_save。旧编辑路由仅用于兼容跳转到只读详情。':isSurveyTypes?'系统预置类型的 source 保留为 system；创建时间读取 localStorage 键 survey-app-first-opened-at-v1。自定义类型继续在新增时写入实际 createdAt。打开、关闭分别记录 prd_rule_open、prd_rule_close。':'字段来源以上表为准。打开、关闭分别记录 prd_rule_open、prd_rule_close，公共参数包含 portal、device、page_key、overlay_key、entry_type 和 timestamp。';
 	 const riskText=isRecipientSelector?'正式环境依赖组织通讯录、部门关系、工作组成员关系及接收权限接口；服务端必须按组织边界复核scopeType、scopeId与personId，并在读取和提交前刷新解析结果。':isCollectionSettings?'日期状态依赖服务端统一使用 Asia/Shanghai 时区并在读取及填写前重新计算；多端缓存必须同步最新状态。当前原型仅保存非工作日与每日提醒配置，不执行真实节假日判断、定时任务或消息提醒。':'当前数据为前端原型数据或派生结果；规则描述不代表已存在后端接口。PRD 查看层不得修改原业务状态。';
-	 const acceptanceText=isRecipientSelector?'教育局PC和移动端可直接选择部门与有成员的工作组，学校PC和移动端可直接选择部门；范围复选框与展开或导航独立；搜索不缩小范围；取消成员正确转为明确人员；工作组选择单个或部分成员时“全选本组”保持未选中且无半选，全部成员选中后才显示选中；重叠成员按personId去重；确认提交、取消回滚；发布数据保留dynamic scope。':isCollectionSettings?'教育局端、学校端的 PC 与移动端字段、文案、顺序及开关联动一致；非每日方式不渲染三项每日配置且保存 false、false、空；切换每日方式后显示前两项，开启提醒后显示提醒时间，关闭提醒后立即隐藏；单次→每日→单次→每日及关闭→重开提醒的默认值、清空结果正确；新建、草稿和未开始编辑保存均无无效每日配置；纯内部、内外混合和纯外部均可发布，无任何范围时被阻止；空日期及日期倒置校验正确；未来、当天和过期日期分别生成未开始、进行中和已结束。':isSurveyManagement?'教育局端、学校端 PC 的五种状态操作矩阵一致；草稿与未开始问卷四步配置完整回填并更新原记录；仅草稿和已暂停可删除，未开始、进行中及已结束均无删除入口；状态变化时保存或删除被阻止。':isSurveyTypes?'两端系统预置类型均不显示来源标签和禁用文案，操作单元格为空且首次打开时间一致；刷新后时间不变；自定义类型保留实际创建时间和编辑、删除操作。':'字段限制与实际校验一致；展示字段可追溯到明确前端来源；按钮不遮挡原操作；关闭后原界面及输入内容保持不变。';
+	 const acceptanceText=isRecipientSelector?'教育局PC和移动端可直接选择部门与有成员的工作组，学校PC和移动端可直接选择部门；范围复选框与展开或导航独立；搜索不缩小范围；取消成员正确转为明确人员；工作组选择单个或部分成员时“全选本组”保持未选中且无半选，全部成员选中后才显示选中；重叠成员按personId去重；确认提交、取消回滚；发布数据保留dynamic scope。':isCollectionSettings?'教育局端、学校端的新建问卷字段、文案、顺序及开关联动一致；非每日方式不渲染三项每日配置且保存 false、false、空；切换每日方式后显示前两项，开启提醒后显示提醒时间，关闭提醒后立即隐藏；纯内部、内外混合和纯外部均可发布，无任何范围时被阻止；空日期及日期倒置校验正确。':isSurveyManagement?'教育局端、学校端的 PC 与移动端已有问卷均只支持查看；列表无编辑或修改入口；旧编辑地址、设备切换和构造事件均不能进入编辑状态或覆盖原数据。':isSurveyTypes?'两端系统预置类型均不显示来源标签和禁用文案，操作单元格为空且首次打开时间一致；刷新后时间不变；自定义类型保留实际创建时间和编辑、删除操作。':'字段限制与实际校验一致；展示字段可追溯到明确前端来源；按钮不遮挡原操作；关闭后原界面及输入内容保持不变。';
  const outScopeText=isRecipientSelector?'组织架构维护、人员入离职管理、部门负责人配置和数据库持久化。':isCollectionSettings?'历史已发布问卷日期补录、数据库迁移、后端定时任务及精确到时分秒的日期选择。':'后端接口实现、数据库持久化、入口展示页及原型端/设备切换器。';
  return `<article class="prd-document"><header class="prd-document-head"><div><small>${entryType==='page'?'页面':'弹窗'}规则 · ${esc(key)}</small><h2>${esc(rule.title)}</h2></div><button type="button" class="prd-close" aria-label="关闭 PRD 规则">×</button></header>${prerequisite}<section><h3>1. 背景与目标</h3><p>${esc(rule.goal)}</p></section><section><h3>2. 用户与使用场景</h3><p>供产品、设计、前端、后端和测试人员在当前原型上下文中核对界面规则。</p></section><section><h3>3. 需求范围</h3><h4>In Scope</h4><p>当前${entryType==='page'?'页面':'覆盖层'}的字段、展示、操作、状态和异常规则。</p><h4>Out of Scope</h4><p>${outScopeText}</p></section><section><h3>4. 功能需求列表</h3>${features}</section><section><h3>5. 核心流程与交互说明</h3><p>${flowText}</p>${fields}</section><section><h3>6. 异常场景与边界条件</h3><p>${exceptionText}</p></section><section><h3>7. 数据口径与埋点需求</h3><p>${dataText}</p></section><section><h3>8. 风险、依赖与限制</h3><p>${riskText}</p></section><section><h3>9. 验收标准</h3><p>${acceptanceText}</p></section></article>`
 }
@@ -386,7 +385,7 @@ function returnFromMobileWidget(){const record=readMobileWidgetReturn(),target=r
 function mount(){const root=$('#app'); if(!root)return; state.portal=root.dataset.portal;state.resourceCenterEnabled=root.dataset.resourceCenterEnabled!=='false';state.preview=sessionStorage.getItem('survey-preview')||(innerWidth<=720?'mobile':'pc'); state.questions=defaultQuestions(); window.addEventListener('hashchange',route);document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(state.createSurveyMenuOpen){state.createSurveyMenuOpen=false;renderShell();setTimeout(()=>$('[data-create-survey-menu-toggle]')?.focus(),0);return}closePrd('escape')});document.addEventListener('click',e=>{const button=e.composedPath().find(node=>node?.dataset?.prdEntry==='overlay');if(!button)return;e.preventDefault();e.stopImmediatePropagation();openPrd(button.dataset.prdKey,'overlay')},true);new MutationObserver(()=>{scanOverlayPrd();applyRuntimeConstraints(root)}).observe(root,{childList:true,subtree:true}); route()}
 function route(){if($('#prd-layer')?.classList.contains('show'))closePrd('route_change');const previous=state.page;let next=(location.hash||'#list').slice(1).split('?')[0];if(next==='dashboard'){location.replace('#list');return}const folderContext=saveFolderRouteContext(next);if(folderContext&&(state.preview!=='mobile'||!folderContext.allowed||!folderContext.count)){clearAttachmentSelections();const fallback=folderContext.survey?`stats/detail/${folderContext.survey.id}`:'stats';if(next!==fallback){location.replace(`#${fallback}`);return}next=fallback}if(shouldClearAttachmentSelections(previous,next))clearAttachmentSelections();if(next!=='list')state.createSurveyMenuOpen=false;state.page=next;if(state.page==='create'){location.replace('#list/create');return}if(state.portal==='bureau'&&state.preview==='pc'&&state.page==='stats'){location.replace('#all-surveys');return}renderShell()}
 function renderShell(){syncAllSurveyTemporalStatuses();const c=CONFIG[state.portal],mobile=state.preview==='mobile',activePage=state.page.startsWith('list/')?'list':state.page.startsWith('all-surveys/')?'all-surveys':state.page.startsWith('templates/')?'templates':state.page.startsWith('stats')?'stats':state.page; document.title=`${c.org} · 教育问卷调研`; $('#app').innerHTML=`<div class="prototype-shell ${mobile?'device-mobile':'device-pc'}"><div class="prototype-switch"><div><button class="${state.portal==='bureau'?'active':''}" data-portal-switch="bureau">教育局端</button><button class="${state.portal==='school'?'active':''}" data-portal-switch="school">学校端</button></div><div><button class="${!mobile?'active':''}" data-device-switch="pc">PC端</button><button class="${mobile?'active':''}" data-device-switch="mobile">移动端</button></div></div><div class="device-stage"><div class="app portal-${state.portal} ${(state.page.startsWith('stats')||state.page.startsWith('mobile/'))?'stats-app':''}"><aside class="sidebar"><div class="side-brand"><span class="brand-mark">调</span><div>教育问卷调研<div class="side-caption">${c.name}</div></div></div><nav class="side-menu">${c.menus.map(m=>`<a class="menu-item ${activePage===m[0]?'active':''}" href="#${m[0]}"><span>${m[1]}</span></a>`).join('')}</nav></aside><main class="main"><header class="topbar"><div><div class="org-title">${c.org}</div><div class="org-sub">教育问卷调研 · ${c.name}</div></div><div class="top-actions"><span class="avatar">${c.user[0]}</span><span>${c.user}</span></div></header><section class="content" id="view">${renderPage()}${mobileWidgetEntry()}</section></main></div></div></div><div class="modal-mask" id="modal"></div><div class="prd-mask" id="prd-layer"></div><div class="toast" id="toast"></div>`;bind();installPagePrdButton();if(mobile&&MOBILE_WIDGET_MAIN_ROUTES.has(state.page))widgetEntryTrack('survey_widget_entry_expose',state.page,'mobile/widget')}
-function deviceSwitchPage(target){const templateWorkflow=state.page==='templates/create'||state.page.startsWith('templates/edit/'),pcCreation=state.page==='list/create'||state.page.startsWith('list/edit/'),mobileCreation=['mobile/create','mobile/settings','mobile/recipients'].includes(state.page);if(target==='mobile'){if(state.page==='cloud-widget')return'mobile/widget';if(state.templateSelectOpen||state.page==='list/template-select'||templateWorkflow)return'mobile/templates';if(pcCreation)return state.step>=4?'mobile/settings':state.step===3?'mobile/recipients':'mobile/create';if(state.page.startsWith('mobile/')||state.page.startsWith('stats'))return state.page;return'mobile/fill'}if(state.page==='mobile/widget')return'cloud-widget';if(state.page==='mobile/templates')return'list/template-select';if(state.page.startsWith('stats/save-folder/'))return state.resourceReturnPage||`stats/detail/${state.page.split('/')[2]}`;if(mobileCreation){state.step=state.page==='mobile/settings'?4:state.page==='mobile/recipients'?3:(state.questions.length?2:1);return state.editingSurveyId?`list/edit/${state.editingSurveyId}`:'list/create'}if(state.page.startsWith('stats'))return state.page;return state.page.startsWith('mobile/')?'list':state.page}
+function deviceSwitchPage(target){const templateWorkflow=state.page==='templates/create'||state.page.startsWith('templates/edit/'),pcCreation=state.page==='list/create',mobileCreation=['mobile/create','mobile/settings','mobile/recipients'].includes(state.page);if(target==='mobile'){if(state.page==='cloud-widget')return'mobile/widget';if(state.templateSelectOpen||state.page==='list/template-select'||templateWorkflow)return'mobile/templates';if(pcCreation)return state.step>=4?'mobile/settings':state.step===3?'mobile/recipients':'mobile/create';if(state.page.startsWith('mobile/')||state.page.startsWith('stats'))return state.page;return'mobile/fill'}if(state.page==='mobile/widget')return'cloud-widget';if(state.page==='mobile/templates')return'list/template-select';if(state.page.startsWith('stats/save-folder/'))return state.resourceReturnPage||`stats/detail/${state.page.split('/')[2]}`;if(mobileCreation){state.step=state.page==='mobile/settings'?4:state.page==='mobile/recipients'?3:(state.questions.length?2:1);return'list/create'}if(state.page.startsWith('stats'))return state.page;return state.page.startsWith('mobile/')?'list':state.page}
 function switchDevice(target){
  if(target===state.preview)return;
  const templateWorkflow=state.page==='templates/create'||state.page.startsWith('templates/edit/');
@@ -437,13 +436,14 @@ function fillStatusLabel(s){return fillStatusKey(s)==='submitted'?'已填写':'�
 function surveyTable(rows,compact=false,view='published',start=0){const showFill=!compact&&view==='received',columns=compact?6:showFill?10:9;return `<div class="${compact?'compact-list':'table-wrap'}"><table class="data-table"><thead><tr><th class="index-col">序号</th><th>问卷名称</th><th>问卷类型</th><th>发送人数</th><th>提交人数</th><th>状态</th>${showFill?'<th>填写状态</th>':''}${compact?'':'<th>创建人</th><th>创建时间</th><th>操作</th>'}</tr></thead><tbody>${rows.length?rows.map((s,i)=>`<tr data-id="${s.id}" data-title="${esc(s.title)}" data-owner="${esc(s.owner)}" data-type="${esc(s.surveyTypeId)}" data-status="${s.status}"><td class="index-col">${start+i+1}</td><td><div class="title-cell">${esc(s.title)}</div>${compact?`<div class="meta-line">${esc(s.time)}</div>`:''}</td><td>${esc(surveyTypeLabel(s))}</td><td>${sentCount(s)}</td><td>${submittedCount(s)}</td><td><span class="tag ${s.status}">${s.statusText}</span></td>${showFill?`<td><span class="tag fill-${fillStatusKey(s)}">${fillStatusLabel(s)}</span></td>`:''}${compact?'':`<td>${esc(s.owner)}</td><td class="nowrap">${s.createdAt}</td><td><div class="row-actions">${view==='received'?receivedActions(s):publishedActions(s)}</div></td>`}</tr>`).join(''):`<tr><td colspan="${columns}"><div class="empty-state"><b>未找到符合条件的问卷</b><span>请调整筛选条件后重试</span></div></td></tr>`}</tbody></table></div>`}
 function canDeleteSurvey(s){return Boolean(s&&s.deleted!==1&&s.owner===currentUserName()&&['draft','paused'].includes(s.status))}
 function publishedActions(s){
- if(s.status==='draft')return '<button class="link-btn" data-action="edit-draft">编辑</button><button class="link-btn danger" data-action="delete-survey">删除</button>';
+ const view=`<a class="link-btn" href="#all-surveys/${s.id}" data-survey-detail-source="list">查看</a>`;
+ if(s.status==='draft')return `${view}<button class="link-btn danger" data-action="delete-survey">删除</button>`;
  const qrAction=s.allowExternal===true||s.channel!=='internal'?`<button class="link-btn" data-survey-qr="${s.id}">二维码</button>`:'';
- if(s.status==='not_started')return `<a class="link-btn" href="#all-surveys/${s.id}" data-survey-detail-source="list">查看</a><button class="link-btn" data-action="edit-survey">编辑</button><button class="link-btn" data-action="view-stats">问卷统计</button>${qrAction}<button class="link-btn danger" data-action="end">结束</button>`;
+ if(s.status==='not_started')return `${view}<button class="link-btn" data-action="view-stats">问卷统计</button>${qrAction}<button class="link-btn danger" data-action="end">结束</button>`;
  const statusActions=s.status==='running'?'<button class="link-btn" data-action="pause">暂停</button><button class="link-btn danger" data-action="end">结束</button>':s.status==='paused'?'<button class="link-btn" data-action="resume">恢复</button><button class="link-btn danger" data-action="end">结束</button>':'';
  const deleteAction=s.status==='paused'?'<button class="link-btn danger" data-action="delete-survey">删除</button>':'';
  const statsAction=hasStatsTask(s)?'<button class="link-btn" data-action="view-stats">问卷统计</button>':'<button class="link-btn" type="button" disabled title="暂无可统计任务日期">问卷统计</button>';
- return `${statsAction}${qrAction}${statusActions}${deleteAction}`
+ return `${view}${statsAction}${qrAction}${statusActions}${deleteAction}`
 }
 function responseRecords(s){return [...(MY_RESPONSES[state.portal]?.[s.id]||[])].filter(r=>r.valid!==false).sort((a,b)=>b.submittedAt.localeCompare(a.submittedAt))}
 function localDateKey(value=new Date()){const d=value instanceof Date?value:new Date(value);const pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
@@ -544,29 +544,15 @@ function allSurveyRows(){const f=state.allSurveyFilters,invalid=f.start&&f.end&&
 function allSurveysTable(rows,start=0){return `<div class="table-wrap"><table class="data-table all-surveys-table"><thead><tr><th class="index-col">序号</th><th>问卷名称</th><th>问卷类型</th><th>发送人数</th><th>提交人数</th><th>问卷状态</th><th>创建人员</th><th>创建时间</th><th>操作</th></tr></thead><tbody>${rows.length?rows.map((s,i)=>`<tr data-id="${s.id}" data-title="${esc(s.title)}" data-owner="${esc(s.owner)}" data-created-date="${s.createdAt.slice(0,10)}" data-status="${s.status}"><td class="index-col">${start+i+1}</td><td><div class="title-cell">${esc(s.title)}</div></td><td>${esc(surveyTypeLabel(s))}</td><td>${sentCount(s)}</td><td>${submittedCount(s)}</td><td><span class="tag ${s.status}">${s.statusText}</span></td><td>${esc(s.owner)}</td><td class="nowrap">${s.createdAt}</td><td><div class="row-actions"><a class="link-btn" href="#all-surveys/${s.id}" data-survey-detail-source="all-surveys">查看详情</a>${s.status==='draft'?'':(s.status==='not_started'||hasStatsTask(s))?`<a class="link-btn" href="#stats/detail/${s.id}" data-stats-source="all-surveys">问卷统计</a>`:'<span class="link-btn disabled" aria-disabled="true" title="暂无可统计任务日期">问卷统计</span>'}</div></td></tr>`).join(''):`<tr><td colspan="9"><div class="empty-state"><b>未找到符合条件的问卷</b><span>请调整筛选条件后重试</span></div></td></tr>`}</tbody></table></div>`}
 function allSurveysPage(){const f=state.allSurveyFilters,validStatuses=['','not_started','running','paused','ended'];if(!validStatuses.includes(f.status))f.status='';const result=allSurveyRows(),page=paginateItems('all-surveys',result.rows),scope=state.portal==='bureau'?'当前教育局':'当前学校';return `${pageHead('问卷管理',`查看${scope}内所有人员创建的已发布问卷，草稿及已删除问卷不展示。`)}<div class="filter-card all-survey-filter"><div class="toolbar filter-toolbar"><label class="filter-item"><span>问卷名称：</span><input id="all-filter-title" type="text" maxlength="50" value="${esc(f.title)}" placeholder="请输入问卷名称"></label><label class="filter-item"><span>创建人员：</span><input id="all-filter-owner" type="text" maxlength="50" value="${esc(f.owner)}" placeholder="请输入创建人员"></label><label class="filter-item"><span>创建时间：</span><div class="date-range"><input id="all-filter-start" type="date" value="${f.start}"><em>至</em><input id="all-filter-end" type="date" value="${f.end}"></div></label><label class="filter-item"><span>问卷状态：</span><select id="all-filter-status" class="select">${filterOptions([['','全部'],['not_started','未开始'],['running','进行中'],['paused','已暂停'],['ended','已结束']],f.status)}</select></label></div><div class="filter-footer"><span class="subtle" id="all-filter-count">共 ${page.total} 条记录</span><span class="filter-error" id="all-filter-error">${result.invalid?'开始时间不能晚于结束时间':''}</span></div></div><div id="all-surveys-table">${allSurveysTable(page.items,page.start)}${paginationComponent('all-surveys',page.totalPages,page.page,page.total)}</div>`}
 function surveyDetailQuestions(s){return surveyQuestions(s).map((question,i)=>`<div class="readonly-question"><span>${String(i+1).padStart(2,'0')}</span><div><b>${esc(question.title)}</b><p>${questionTypeLabel(question.type)} · ${question.required?'必答':'选答'}</p></div></div>`).join('')}
-const SURVEY_SCOPE_ORDER={
- bureau:[['department','教育局内部'],['workgroup','工作组'],['school','学校'],['external','外部']],
- school:[['department','学校内部'],['parent','家长'],['class','班级'],['external','外部']]
-};
-function surveyScopeCategories(s){
- const categories=new Set(),snapshot=Array.isArray(s?.recipientSnapshot)?s.recipientSnapshot:[];
- snapshot.forEach(item=>{
-  const sources=Array.isArray(item?.sourceCategories)&&item.sourceCategories.length?item.sourceCategories:Array.isArray(item?.category)?item.category:[item?.category];
-  sources.filter(Boolean).forEach(category=>categories.add(category==='legacy'?'department':category))
- });
- if(!snapshot.length&&Number(s?.total)>0)categories.add('department');
- if(s?.allowExternal===true||(s?.channel&&s.channel!=='internal'))categories.add('external');
- return categories
-}
-function surveyDataScope(s){const categories=surveyScopeCategories(s),order=SURVEY_SCOPE_ORDER[state.portal]||[];return order.filter(([category])=>categories.has(category)).map(([,label])=>label).join(' + ')||'—'}
-function allSurveyDetailPage(){const id=Number(state.page.split('/')[1]),back=state.surveyDetailBack||'#all-surveys',backLabel=back==='#list'?'返回我的问卷':'返回问卷管理',s=CONFIG[state.portal].surveys.find(x=>x.id===id&&x.deleted!==1);if(!s)return `<a class="back-link" href="${back}">← ${backLabel}</a><div class="empty-state detail-empty"><b>问卷不存在或无权查看</b><span>该问卷已删除、不属于当前组织，或链接无效。</span></div>`;const questions=surveyQuestions(s);return `<a class="back-link" href="${back}">← ${backLabel}</a>${pageHead('问卷详情','只读查看问卷配置、接收人员与答卷明细。')}<div class="detail-head"><div class="detail-title">${esc(s.title)}</div><div class="detail-meta"><span>创建人员：${esc(s.owner)}</span><span>创建时间：${s.createdAt}</span><span>问卷类型：${esc(surveyTypeLabel(s))}</span><span class="tag ${s.status}">${s.statusText}</span></div></div><section class="form-card"><div class="section-title">基础信息与发布设置</div><div class="detail-info-grid"><div><span>问卷名称</span><b>${esc(s.title)}</b></div><div><span>问卷类型</span><b>${esc(surveyTypeLabel(s))}</b></div><div><span>接收人员</span><b>${esc(s.target)}</b></div><div><span>填写周期</span><b>${esc(s.time)}</b></div><div class="detail-data-scope"><span>数据范围</span><b>${esc(surveyDataScope(s))}</b></div></div></section><section class="form-card readonly-questions"><div class="section-title">问卷题目 <span class="subtle">共 ${questions.length} 题</span></div>${surveyDetailQuestions(s)}</section>${s.done?`<section class="form-card"><div class="section-title">答卷明细</div>${detailStats(s)}</section>`:''}`}
+function surveyRecipientDisplayNames(s){const names=[],seen=new Set(),items=surveyRecipientItems(s)||[];items.forEach((item,index)=>{const name=String(item?.name||item?.scopeName||item?.nameSnapshot||item?.departmentNameSnapshot||item?.workgroupNameSnapshot||'').trim();if(!name)return;const personId=item?.personId,id=personId||item?.scopeId||item?.departmentId||item?.workgroupId||item?.schoolId||item?.classId||item?.parentId||item?.id||name,key=personId?`person:${personId}`:`${item?.scopeType||item?.category||item?.level||'recipient'}:${id||index}`;if(seen.has(key))return;seen.add(key);names.push(name)});const target=String(s?.target||'').trim();if(!names.length&&target&&target!=='未选择')names.push(target);const external=s?.allowExternal===true||Boolean(s?.channel&&s.channel!=='internal');if(external&&!names.some(name=>name.includes('外部')))names.push('外部人员');return names.length?names:['—']}
+function allSurveyDetailPage(){const id=Number(state.page.split('/')[1]),back=state.surveyDetailBack||'#all-surveys',backLabel=back==='#list'?'返回我的问卷':'返回问卷管理',s=CONFIG[state.portal].surveys.find(x=>x.id===id&&x.deleted!==1);if(!s)return `<a class="back-link" href="${back}">← ${backLabel}</a><div class="empty-state detail-empty"><b>问卷不存在或无权查看</b><span>该问卷已删除、不属于当前组织，或链接无效。</span></div>`;const questions=surveyQuestions(s),recipientNames=surveyRecipientDisplayNames(s);return `<a class="back-link" href="${back}">← ${backLabel}</a>${pageHead('问卷详情','只读查看问卷配置、接收人员与答卷明细。')}<div class="detail-head"><div class="detail-title">${esc(s.title)}</div><div class="detail-meta"><span>创建人员：${esc(s.owner)}</span><span>创建时间：${s.createdAt}</span><span>问卷类型：${esc(surveyTypeLabel(s))}</span><span class="tag ${s.status}">${s.statusText}</span></div></div><section class="form-card"><div class="section-title">基础信息与发布设置</div><div class="detail-info-grid"><div><span>问卷名称</span><b>${esc(s.title)}</b></div><div><span>问卷类型</span><b>${esc(surveyTypeLabel(s))}</b></div><div><span>填写周期</span><b>${esc(s.time)}</b></div><div class="detail-recipients"><span>接收人员</span><b class="detail-recipient-names">${recipientNames.map(esc).join('、')}</b></div></div></section><section class="form-card readonly-questions"><div class="section-title">问卷题目 <span class="subtle">共 ${questions.length} 题</span></div>${surveyDetailQuestions(s)}</section>${s.done?`<section class="form-card"><div class="section-title">答卷明细</div>${detailStats(s)}</section>`:''}`}
 function allSurveyResponsePage(){const parts=state.page.split('/'),surveyId=Number(parts[1]),responseId=decodeRoutePart(parts[3]),s=CONFIG[state.portal].surveys.find(x=>x.id===surveyId&&x.deleted!==1),back=s?`#all-surveys/${s.id}`:'#all-surveys';if(!s)return `<a class="back-link" href="#all-surveys">← 返回问卷管理</a><div class="empty-state detail-empty"><b>答卷不存在或无权查看</b><span>对应问卷已删除、不属于当前组织，或链接无效。</span></div>`;const person=statsPeopleData('submitted',s,true).find(item=>item.responseId===responseId);if(!person)return `<a class="back-link" href="${back}">← 返回问卷详情</a><div class="empty-state detail-empty"><b>答卷不存在或无权查看</b><span>该答卷不存在、已失效，或不属于当前组织。</span></div>`;const questions=statsQuestions(s);return `<a class="back-link" href="${back}">← 返回问卷详情</a>${pageHead('答卷详情','')}<section class="response-record-card"><div class="response-record-title"><div><h2>${esc(s.title)}</h2><p>答卷编号：${esc(person.responseId)}</p></div><span class="tag running">${esc(person.status)}</span></div><div class="response-record-meta"><div><span>提交人</span><b>${esc(person.name)}</b></div><div><span>所属组织</span><b>${esc(person.scope)}</b></div><div><span>身份</span><b>${esc(person.identity)}</b></div><div><span>手机号</span><b>${esc(person.mobile)}</b></div><div><span>提交时间</span><b>${esc(person.submittedAt)}</b></div></div></section><section class="response-answer response-record-answers card"><div class="response-answer-head"><div><h3>问卷内容</h3><p>共 ${questions.length} 题，以下为该用户本次提交的完整内容。</p></div></div><div class="answer-list">${questions.map((question,index)=>`<div class="answer-item"><span>${String(index+1).padStart(2,'0')}</span><div><b>${esc(question.title)}</b><small>${esc(question.type)}</small>${responseAnswerMarkup(question,person.answers[index])}</div></div>`).join('')}</div></section>`}
 function filterOptions(items,value){return items.map(item=>{const pair=Array.isArray(item)?item:[item,item||'全部'];return `<option value="${pair[0]}" ${pair[0]===value?'selected':''}>${pair[1]}</option>`}).join('')}
 function steps(){return `<div class="steps">${['基础信息','问卷设计','接收人员','收集设置'].map((x,i)=>`<div class="step ${state.step===i+1?'active':state.step>i+1?'done':''}"><span class="step-num">${state.step>i+1?'✓':i+1}</span>${x}</div>`).join('')}</div>`}
 function templateSteps(){return `<div class="steps">${['基础信息','问卷设计'].map((x,i)=>`<div class="step ${state.step===i+1?'active':state.step>i+1?'done':''}"><span class="step-num">${state.step>i+1?'✓':i+1}</span>${x}</div>`).join('')}</div>`}
 function editingSurveyRecord(){return state.editingSurveyId?CONFIG[state.portal].surveys.find(item=>item.id===state.editingSurveyId&&item.deleted!==1&&item.owner===currentUserName()):null}
-function createPage(editing=false){const existing=editing?editingSurveyRecord():null,publishedEdit=existing?.status==='not_started',title=publishedEdit?'编辑问卷':editing?'编辑草稿':'新增问卷',actions=publishedEdit?'':'<button class="btn" data-action="save-draft">保存草稿</button>';return `<a class="back-link" href="#list">← 返回我的问卷</a>${pageHead(title,'完成问卷设计、对象选择与收集设置。',actions)} ${steps()} ${state.step===1?basicStep():state.step===2?editorStep():state.step===3?objectStep():publishStep(publishedEdit?'save':'publish')}`}
-function editSurveyPage(){const id=Number(state.page.split('/')[2]),s=CONFIG[state.portal].surveys.find(item=>item.id===id&&item.deleted!==1&&['draft','not_started'].includes(item.status)&&item.owner===currentUserName());if(!s)return `<a class="back-link" href="#list">← 返回我的问卷</a><div class="empty-state detail-empty"><b>问卷不存在或不可编辑</b><span>该问卷已删除、状态已变化，或不属于当前用户。</span></div>`;syncSurveyTemporalStatus(s);if(!['draft','not_started'].includes(s.status))return `<a class="back-link" href="#list">← 返回我的问卷</a><div class="empty-state detail-empty"><b>问卷状态已变化</b><span>该问卷已开始，当前不可继续编辑。</span></div>`;if(state.editingSurveyId!==s.id)loadEditableSurveyState(s);return createPage(true)}
+function createPage(){return `<a class="back-link" href="#list">← 返回我的问卷</a>${pageHead('新增问卷','完成问卷设计、对象选择与收集设置。','<button class="btn" data-action="save-draft">保存草稿</button>')} ${steps()} ${state.step===1?basicStep():state.step===2?editorStep():state.step===3?objectStep():publishStep('publish')}`}
+function editSurveyPage(){const id=Number(state.page.split('/')[2]),s=CONFIG[state.portal].surveys.find(item=>item.id===id&&item.deleted!==1&&item.owner===currentUserName());if(!s)return `<a class="back-link" href="#list">← 返回我的问卷</a><div class="empty-state detail-empty"><b>问卷不存在或无权查看</b><span>该问卷已删除、链接无效，或不属于当前用户。</span></div>`;state.surveyDetailBack='#list';state.page=`all-surveys/${s.id}`;history.replaceState(null,'',`#all-surveys/${s.id}`);return allSurveyDetailPage()}
 function createTemplatePage(){const routeId=state.page.startsWith('templates/edit/')?decodeURIComponent(state.page.split('/')[2]||''):'';if(routeId&&String(state.editingSurveyTemplateId)!==routeId){const item=surveyTemplateItems().find(x=>String(x.id)===routeId);if(!item)return `<a class="back-link" href="#templates">← 返回模板中心</a><div class="empty-state"><b>模板不存在</b><span>该模板已被删除或不属于当前端。</span></div>`;if(item.source==='system'){state.editingSurveyTemplateId=null;setTimeout(()=>{location.hash='templates';setTimeout(()=>toast('系统模板不可编辑'),0)},0);return `<a class="back-link" href="#templates">← 返回模板中心</a><div class="empty-state"><b>系统模板不可编辑</b><span>正在返回模板中心。</span></div>`}loadSurveyTemplateState(item,true)}if(state.step<1||state.step>2)state.step=1;const editing=Boolean(routeId);return `<a class="back-link" href="#templates">← 返回模板中心</a>${pageHead(editing?'编辑模板':'新增模板','配置模板的基础信息与问卷题目。')} ${templateSteps()} ${state.step===1?templateBasicStep():templateEditorStep()}`}
 function basicStep(){return `<div class="basic-layout"><div class="form-card"><div class="section-title">基础信息</div><div class="form-grid"><div class="field full"><label class="required">问卷标题</label><input id="survey-title" type="text" maxlength="50" value="${esc(state.draftTitle)}" placeholder="请输入清晰、具体的问卷标题"></div><div class="field full"><label class="required">问卷类型</label><select id="survey-type" class="select">${state.editingSurveyId?surveyTypeDraftOptions():surveyTypeOptions(state.draftSurveyTypeId)}</select></div><div class="field full"><label>问卷说明</label><textarea id="survey-description" maxlength="500" placeholder="说明调查目的、填写要求和数据用途">${esc(state.draftDescription)}</textarea></div></div><div class="footer-actions"><button class="btn primary" data-action="next">下一步</button></div></div></div>`}
 function templateBasicStep(){return `<div class="basic-layout"><div class="form-card"><div class="section-title">基础信息</div><div class="form-grid"><div class="field full"><label class="required">模板名称</label><input id="survey-title" type="text" maxlength="50" value="${esc(state.draftTitle)}" placeholder="请输入模板名称"></div><div class="field full"><label class="required">问卷类型</label><select id="survey-type" class="select">${surveyTypeOptions(state.draftSurveyTypeId)}</select></div><div class="field full"><label>问卷说明</label><textarea id="survey-description" maxlength="500" placeholder="说明模板适用场景与填写要求">${esc(state.draftDescription)}</textarea></div></div><div class="footer-actions"><button class="btn primary" data-action="next">下一步</button></div></div></div>`}
@@ -684,10 +670,11 @@ function draftRecipientSnapshot(s){if(s.recipientSnapshot?.length)return s.recip
 function loadEditableSurveyState(s){resetCreationState();state.editingSurveyId=s.id;state.draftTitle=s.title||'';state.draftDescription=s.description||'请根据实际情况填写，本问卷数据仅用于相关工作分析。';state.draftSurveyTypeId=String(s.surveyTypeId||'');state.draftSurveyTypeName=s.surveyTypeName||surveyTypeName(s.surveyTypeId,'未分类');state.preserveSurveyTypeSnapshot=true;state.questions=cloneQuestions(s.questions?.length?s.questions:defaultQuestions());Object.assign(state,normalizedCollectionSettings({frequency:s.frequency||'single',skipNonWorkday:s.skipNonWorkday,dailyReminder:s.dailyReminder,reminderTime:s.reminderTime}));state.startDate=s.startDate||collectionDefaultDate();state.endDate=s.endDate||collectionDefaultDate(7);state.allowModify=false;state.externalRecipient=Boolean(s.allowExternal||s.channel!=='internal');draftRecipientSnapshot(s).forEach(item=>{const id=item.personId||item.id;state.recipients.set(id,{...item,id})})}
 function captureCreationInputs(){const title=$('#survey-title')||$('#mobile-title'),description=$('#survey-description')||$('#mobile-description'),surveyType=$('#survey-type')||$('#mobile-survey-type');if(title)state.draftTitle=title.value.trim();if(description)state.draftDescription=description.value.trim();if(surveyType&&surveyType.value!==SURVEY_TYPE_SNAPSHOT_OPTION){state.draftSurveyTypeId=surveyType.value;state.draftSurveyTypeName=surveyTypeName(surveyType.value,'');state.preserveSurveyTypeSnapshot=false}const external=$('#allow-external')||$('#mobile-allow-external'),start=$('#start-date')||$('#mobile-start-date'),end=$('#end-date')||$('#mobile-end-date'),reminder=$('#reminder-time')||$('#mobile-reminder-time');if(external)state.externalRecipient=external.checked;if(start)state.startDate=start.value;if(end)state.endDate=end.value;if(reminder)state.reminderTime=reminder.value}
 function draftPayload(existing=null){const external=state.externalRecipient,total=recipientCount(),collection=normalizedCollectionSettings(state),preserve=Boolean(existing&&state.preserveSurveyTypeSnapshot&&state.draftSurveyTypeName),selectedType=surveyTypeById(state.draftSurveyTypeId),surveyTypeId=preserve?state.draftSurveyTypeId:selectedType?.id||'',surveyTypeName=preserve?state.draftSurveyTypeName:selectedType?.name||'';return{title:state.draftTitle||existing?.title||'未命名问卷',description:state.draftDescription,surveyTypeId,surveyTypeName,channel:external?'public':'internal',allowExternal:external,target:recipientSummary()||existing?.target||'未选择',time:'未发布',startDate:state.startDate,endDate:state.endDate,internalDone:0,externalDone:0,done:0,total,recipientSnapshot:selectedRecipientSnapshot(),received:false,frequency:collection.frequency,allowModify:false,skipNonWorkday:collection.skipNonWorkday,dailyReminder:collection.dailyReminder,reminderTime:collection.reminderTime,questions:cloneQuestions(state.questions)}}
-function saveDraftSurvey(){captureCreationInputs();if(!state.draftTitle){toast('请输入问卷标题');return}if(!draftSurveyTypeValid()){state.step=1;renderShell();toast('请选择问卷类型');return}const questionError=firstQuestionError();if(showQuestionError(questionError))return;state.questions.forEach(q=>{if(['单选','多选'].includes(q.type))q.options=q.options.map(x=>x.trim()).filter(Boolean)});const c=CONFIG[state.portal],existing=state.editingSurveyId?c.surveys.find(s=>s.id===state.editingSurveyId&&s.status==='draft'):null,payload=draftPayload(existing);if(existing)Object.assign(existing,payload);else{const id=Date.now();c.surveys.unshift({id,...payload,owner:currentUserName(),createdAt:formatSystemTime(),deleted:0,status:'draft',statusText:'草稿'});state.editingSurveyId=id;state.draftSurveyTypeName=payload.surveyTypeName;state.preserveSurveyTypeSnapshot=true}toast('草稿已保存')}
+function saveDraftSurvey(){if(state.editingSurveyId){toast('已有问卷仅支持查看，不能修改原数据');return}captureCreationInputs();if(!state.draftTitle){toast('请输入问卷标题');return}if(!draftSurveyTypeValid()){state.step=1;renderShell();toast('请选择问卷类型');return}const questionError=firstQuestionError();if(showQuestionError(questionError))return;state.questions.forEach(q=>{if(['单选','多选'].includes(q.type))q.options=q.options.map(x=>x.trim()).filter(Boolean)});const c=CONFIG[state.portal],payload=draftPayload(),id=Date.now();c.surveys.unshift({id,...payload,owner:currentUserName(),createdAt:formatSystemTime(),deleted:0,status:'draft',statusText:'草稿'});resetCreationState();state.listView='published';state.page='list';location.hash='list';renderShell();toast('草稿已保存，已有问卷仅支持查看')}
 function selectedRecipientSnapshot(){return [...state.recipients.values()].map(item=>item.level==='person'?{personId:item.personId,name:item.name,count:1,category:item.category||'department',level:'person',departmentId:item.departmentId,departmentName:item.departmentName,position:item.position,status:item.status}:{id:item.id,name:item.name,count:item.count,category:item.category,level:item.level})}
 function draftValidationError(){if(!state.draftTitle.trim())return'请输入问卷标题';if(state.draftTitle.trim().length>50)return'问卷标题不能超过 50 个字符';if(!draftSurveyTypeValid())return'请选择问卷类型';const questionError=firstQuestionError();if(questionError)return questionError.message;if(!state.recipients.size&&!state.externalRecipient)return'请选择接收人员或开启外部填写';if(!state.startDate||!state.endDate)return'请选择开始日期和截止日期';if(state.startDate>state.endDate)return'开始日期不能晚于截止日期';if(state.frequency==='daily'&&state.dailyReminder&&!state.reminderTime)return'请选择每日提醒时间';return''}
 function publishDraft(source='pc'){
+ if(state.editingSurveyId){toast('已有问卷仅支持查看，不能修改原数据');return}
  captureCreationInputs();
  const c=CONFIG[state.portal],editing=Boolean(state.editingSurveyId),existing=editing?c.surveys.find(s=>s.id===state.editingSurveyId&&s.deleted!==1&&s.owner===currentUserName()):null;
  if(editing&&(!existing||!['draft','not_started'].includes(existing.status))){toast('问卷状态已变化，当前不可保存');return}
@@ -1011,8 +998,7 @@ function applySurveyTypeFilter(event){state.surveyTypeKeyword=$('#survey-type-ke
 function applyObjectFilters(){const name=$('#object-name')?.value.trim()||'',type=$('#object-type')?.value||'';$$('.tree-row').forEach((row,i)=>{const typeMatch=!type||type==='组织架构'||type==='校内组织'||(type==='角色'&&i===$$('.tree-row').length-1)||(type==='具体人员'&&false);row.classList.toggle('hidden',!row.innerText.includes(name)||!typeMatch)})}
 function handleAction(a,b){
  const c=CONFIG[state.portal];
- if(a==='edit-draft'){const row=b.closest('tr'),s=c.surveys.find(x=>x.id==row?.dataset.id);if(!s||s.status!=='draft'||s.owner!==currentUserName())return toast('当前草稿不可编辑');state.editingSurveyId=null;location.hash=`list/edit/${s.id}`;return}
- if(a==='edit-survey'){const row=b.closest('tr'),s=c.surveys.find(x=>x.id==row?.dataset.id&&x.deleted!==1&&x.owner===currentUserName());if(!s)return toast('当前问卷不可编辑');syncSurveyTemporalStatus(s);if(s.status!=='not_started')return toast('问卷状态已变化，当前不可编辑');state.editingSurveyId=null;location.hash=`list/edit/${s.id}`;return}
+ if(a==='edit-draft'||a==='edit-survey'){const row=b.closest('tr'),s=c.surveys.find(x=>x.id==row?.dataset.id&&x.deleted!==1&&x.owner===currentUserName());if(!s)return toast('当前问卷不可查看');state.surveyDetailBack='#list';location.hash=`all-surveys/${s.id}`;toast('已有问卷仅支持查看');return}
  if(a==='delete-survey'){const row=b.closest('tr'),s=c.surveys.find(x=>x.id==row?.dataset.id&&x.deleted!==1&&x.owner===currentUserName());if(!s)return toast('当前问卷不可删除');syncSurveyTemporalStatus(s);if(!canDeleteSurvey(s))return toast('当前状态不支持删除');return modal('删除问卷？',`删除“${esc(s.title)}”后，该问卷将从我的问卷、问卷管理和统计列表中移除。`,'确认删除',()=>{syncSurveyTemporalStatus(s);if(!canDeleteSurvey(s)){toast('问卷状态或权限已变化，当前不可删除');renderShell();return}s.deleted=1;renderShell();toast('问卷已删除')})}
  if(a==='view-all-answers'){state.textAnswerViews[b.dataset.answerKey]={expanded:true,page:1};renderShell();return}
  if(a==='collapse-all-answers'){state.textAnswerViews[b.dataset.answerKey]={expanded:false,page:1};renderShell();return}
@@ -1377,7 +1363,7 @@ loadSurveyTemplateState=function(item,editing=false){recipientV2BaseLoadSurveyTe
 const recipientV2BaseRoute=route;
 route=function(){const next=(location.hash||'#list').slice(1).split('?')[0];if(state.recipientPickerMode==='mobile'&&state.recipientPickerDraft){const prefix=`mobile/recipients/${state.recipientPickerCategory}`;if(!next.startsWith(prefix))discardRecipientPicker('back',false)}else if(state.recipientPickerMode==='pc'&&state.recipientPickerDraft&&next!==state.page)discardRecipientPicker('route_change',false);recipientV2BaseRoute()};
 const recipientV2BaseDeviceSwitchPage=deviceSwitchPage;
-deviceSwitchPage=function(target){if(state.recipientPickerDraft)discardRecipientPicker('device_switch',false);if(target==='mobile'&&(state.page==='templates/create'||state.page.startsWith('templates/edit/')))return'mobile/templates';if(target==='pc'&&state.page.startsWith('mobile/recipients')){state.step=3;return state.editingSurveyId?`list/edit/${state.editingSurveyId}`:'list/create'}return recipientV2BaseDeviceSwitchPage(target)};
+deviceSwitchPage=function(target){if(state.recipientPickerDraft)discardRecipientPicker('device_switch',false);if(target==='mobile'&&(state.page==='templates/create'||state.page.startsWith('templates/edit/')))return'mobile/templates';if(target==='pc'&&state.page.startsWith('mobile/recipients')){state.step=3;return'list/create'}return recipientV2BaseDeviceSwitchPage(target)};
 if(!window.__recipientPickerEscapeBound){window.__recipientPickerEscapeBound=true;document.addEventListener('keydown',event=>{if(event.key!=='Escape'||$('#prd-layer')?.classList.contains('show'))return;if(state.recipientPickerMode==='pc'&&state.recipientPickerDraft){event.preventDefault();discardRecipientPicker('escape')}})}
 
 mobileSettingsPage=baseMobileSettingsPage;
@@ -1392,7 +1378,7 @@ PRD_FIELD_GROUPS.recipients=[
  ['学校','学校平铺仅展示学校名称和教职工人数，直选且不下钻；学校类型仅用于筛选，选中即覆盖该校全部有效教职工。','RECIPIENT_DATA.bureau.school[].staffCount'],
  ['选择键与计数','部门动态范围使用 department:scope:{departmentId}；明确人员按 personId 去重，学校按 staffCount 求和。','recipientScopeSelectionKey() / recipientCategoryCount()'],
  ['发布范围','末级部门保存 recipientRules(selectionMode=dynamic_department)，逐人选择保存 explicitPersonIds；工作组继续保存明确人员。','recipientSelectionContract() / selectedRecipientSnapshot()'],
- ['历史兼容','旧草稿或未开始问卷中的学校角色级范围不得自动扩大为整校，编辑时须重新选择学校。','normalizeRecipientMap() / requiresReselection']
+ ['新建兼容','新建过程中若载入旧范围数据，学校角色级范围不得自动扩大为整校，继续发布前须重新选择学校。','normalizeRecipientMap() / requiresReselection']
 ];
 PRD_FIELD_GROUPS.recipientPicker=[
  ['分类','只读；继承当前模块。','state.recipientPickerCategory'],['部门搜索','最多 50 字，匹配人员姓名或部门名称；命中人员时展示所属部门。','state.recipientPickerSearch'],['部门联动','整选末级部门默认覆盖当前全部有效人员；取消任一人转为明确名单，重新补齐后恢复动态部门。','setDraftDynamicScope() / convertDraftScopeToPeople() / promoteCompleteDepartmentScope()'],['工作组搜索','最多 50 字，仅匹配工作组名称。','state.recipientPickerGroupSearch'],['人员搜索','最多 50 字，仅匹配姓名。','state.recipientPickerPersonSearch'],['学校筛选','按学校名称包含匹配，并支持学校类型筛选。','state.recipientPickerSearch / state.recipientPickerSchoolType'],['成员有效性','仅 status=active 且 canReceive=true 的成员参与显示与动态解析。','recipientScopeMembers()'],['确认与取消','确定提交临时副本；取消类操作不写入正式选择。','commitRecipientPicker() / discardRecipientPicker()']
@@ -1401,7 +1387,7 @@ PRD_FIELD_GROUPS.recipientPicker=[
 PRD_PAGE_RULES['create-recipients'].goal='在 PC 端配置末级部门动态范围、明确人员及其他既有接收对象。';
 PRD_PAGE_RULES['mobile-recipients'].goal='在移动端整选末级部门或逐人选择，并与 PC 端保持一致回显。';
 PRD_PAGE_RULES['mobile-settings'].goal='配置外部填写、收集方式、开始日期、截止日期和每日提醒规则。';
-PRD_PAGE_RULES['all-surveys-detail'].goal='只读查看问卷配置、实际接收数据范围和答卷明细；详情不展示发布渠道。';
+PRD_PAGE_RULES['all-surveys-detail'].goal='只读查看问卷配置、完整接收人员和答卷明细；详情不展示数据范围字段。';
 PRD_PAGE_RULES['all-surveys-detail'].fields=prdFields('surveyDetail').filter(row=>!['已提交','未提交','外部提交数','完成率'].includes(row[0]));
 PRD_OVERLAY_RULES['recipient-picker']={title:'接收人员与动态部门选择',goal:'在 PC 专用弹窗中以临时副本选择当前模块对象，并通过确定提交或取消回滚。',fields:prdFields('recipientPicker','recipients')};
 const recipientV2BaseRenderPrdDocument=renderPrdDocument;
@@ -1450,7 +1436,7 @@ Object.assign(PRD_FIELD_GROUPS,{
   ['提交人数','展示内部有效提交与外部有效提交之和；旧数据以 done 兼容。','submittedCount(s) / internalDone / externalDone'],
   ['状态与填写状态','问卷状态包含草稿、未开始、进行中、已暂停、已结束；“我收到的”仅展示进行中、已暂停和已结束问卷，未开始问卷对填写人员不可见；填写状态仅展示未填写、已填写。','fillStatusKey(s) / isReceivedSurveyVisible(s)'],
   ['创建信息','创建人只读；创建时间精确到秒。','s.owner / s.createdAt'],
-  ['我发布的操作','草稿：编辑、删除；未开始：查看、编辑、统计、适用时二维码、结束；进行中：统计、适用时二维码、暂停、结束；已暂停：统计、适用时二维码、恢复、结束、删除；已结束：统计及适用时二维码。','publishedActions(s)'],
+  ['我发布的操作','所有状态均提供“查看”，不提供编辑或修改；草稿与已暂停按规则支持删除，其他统计、二维码及状态操作保持原有权限。','publishedActions(s)'],
   ['我收到的操作','未提交且满足频次与问卷状态时展示“提交问卷”；已有答卷时展示“查看”，已提交答卷不提供修改操作。','receivedActions(s) / canCreateResponse(s)']
  ],
  response:[
@@ -1468,7 +1454,8 @@ Object.assign(PRD_FIELD_GROUPS,{
  ],
  surveyDetail:[
   ['问卷标题/类型/状态','只读；类型展示 surveyTypeName 历史快照；问卷已删除、不属于当前组织或动态 ID 非法时展示不可用空态。','s.title / surveyTypeLabel(s) / s.status'],
-  ['创建与收集信息','展示创建人、创建时间、接收人员、填写周期和按发布快照汇总的数据范围。','s.owner / s.createdAt / s.target / surveyDataScope(s)'],
+  ['创建与收集信息','展示创建人、创建时间和填写周期；详情不展示数据范围字段。','s.owner / s.createdAt / s.time'],
+  ['接收人员','完整展示发布时选择的人员姓名或范围名称；外部填写追加“外部人员”，按稳定 ID 去重并自动换行。','surveyRecipientDisplayNames(s) / surveyRecipientItems(s) / s.target'],
   ['已提交','仅统计内部接收人员的有效提交人数，不包含外部人员提交。','statsSnapshot(s).internalDone'],
   ['未提交','max(0，应提交内部人数 - 内部有效提交数)；不计外部人员；无内部应提交人数时为“—”。','statsSnapshot(s).pending'],
   ['外部提交数','统计外部人员通过微信扫描二维码提交的有效问卷份数。','statsSnapshot(s).externalDone'],
@@ -1496,7 +1483,7 @@ Object.assign(PRD_FIELD_GROUPS,{
   ['学校','学校平铺，仅展示学校名称和教职工人数，直接勾选且不下钻。','schoolPickerMarkup()'],
   ['学校类型筛选','支持按小学、初中、九年一贯制过滤学校列表；学校类型只用于筛选，不在行内展示。','state.recipientPickerSchoolType / filteredBureauSchools()'],
   ['学校覆盖范围','选择学校后覆盖该校全部有效教职工，不包含学生和家长。','RECIPIENT_DATA.bureau.school[].staffCount'],
-  ['历史兼容','旧草稿或未开始问卷中的学校角色级范围不得静默扩大，编辑时要求重新选择学校。','normalizeRecipientMap() / requiresReselection'],
+  ['新建兼容','新建过程中若载入旧范围数据，学校角色级范围不得静默扩大，继续发布前要求重新选择学校。','normalizeRecipientMap() / requiresReselection'],
   ['发布快照','人员按 personId 全局合并并保存 personId、姓名、sourceCategories、部门、职务和工作组来源；学校范围保存 schoolId、学校名称、staffCount、selectionMode: all_staff。','selectedRecipientSnapshot()']
  ],
  publish:[
@@ -1746,7 +1733,7 @@ PRD_FIELD_GROUPS.recipients=[
  ['交叉范围','完整覆盖多个范围时展示全部范围名称；实际人数始终按 personId 全局去重。','recipientResolvedSelection()'],
  ['其他范围覆盖','人员未在当前范围选中但被其他范围覆盖时，标识“已由其他范围选中”。','recipientPersonCoveredByOtherScopes()'],
  ['成员有效性','完整范围只包含 status=active 且 canReceive=true 的人员；范围不存在或有效成员为零时阻止发布。','recipientScopeMembers() / recipientScopeIsInvalid()'],
- ['问卷编辑','草稿与未开始问卷保存范围对象、明确人员及手动拆分标识，再次编辑时保持原回显语义。','recipientSelections / recipientManualPartialScopes'],
+ ['创建过程','新建步骤保存范围对象、明确人员及手动拆分标识，跨步骤返回时保持原回显语义。','recipientSelections / recipientManualPartialScopes'],
  ['发布快照','发布确认时按最新组织成员解析范围，按 personId 合并去重后固化 recipientSnapshot；发布后组织变化不回写。','selectedRecipientSnapshot()']
 ];
 PRD_FIELD_GROUPS.recipientPicker=[
@@ -1768,7 +1755,7 @@ renderRecipientPickerPrd=function(rule,key,entryType){
   ['选择联动','重新补齐','当前范围全部成员重新补齐后清除拆分状态并恢复范围名称。','P0','手动拆分优先'],
   ['交叉范围','来源与去重','完整覆盖多个范围时展示所有范围名称；重叠人员只计一人。','P0','标签与人数口径分离'],
   ['交叉范围','覆盖提示','当前范围未选但人员被其他范围覆盖时显示“已由其他范围选中”。','P0','不得误改总人数'],
-  ['数据保存','问卷编辑','草稿与未开始问卷保存 scope/person 对象及手动拆分键，编辑时恢复原选择语义。','P0','不得提前展开范围'],
+  ['数据保存','创建态恢复','新建步骤保存 scope/person 对象及手动拆分键，跨步骤返回时恢复原选择语义。','P0','不得提前展开范围'],
   ['发布处理','解析并固化','发布确认时按最新有效成员解析范围、合并去重并固化人员快照。','P0','发布后不随组织变化'],
   ['异常校验','失效范围','范围被删除、越权或有效成员为零时标记失效并阻止发布。','P0','不得静默转空']
  ];
@@ -1786,7 +1773,7 @@ PRD_FIELD_GROUPS.recipients=[
  ['交叉范围','同时选择多个范围或明确人员时保留各选择来源，实际人数始终按 personId 全局去重。','recipientResolvedSelection()'],
  ['其他范围覆盖','人员未在当前范围选中但被其他范围覆盖时，标识“已由其他范围选中”。','recipientPersonCoveredByOtherScopes()'],
  ['成员有效性','完整范围只包含 status=active 且 canReceive=true 的人员；范围不存在或有效成员为零时阻止发布。','recipientScopeMembers() / recipientScopeIsInvalid()'],
- ['问卷编辑','草稿与未开始问卷保存范围对象与明确人员；再次编辑时恢复临时副本及原选择语义。','recipientSelections / draftRecipientSnapshot()'],
+ ['创建过程','新建步骤保存范围对象与明确人员；跨步骤返回时恢复临时副本及原选择语义。','recipientSelections / draftRecipientSnapshot()'],
  ['发布数据','recipientSnapshot 保留 dynamic scope，不在发布时展开人员；填写、人数和统计读取时实时解析。','selectedRecipientSnapshot() / surveyRecipientResolution()'],
  ['学校列表','教育局端学校平铺直选，行内仅展示学校名称和教职工人数，不展示学段或学校类型。','schoolPickerMarkup()'],
  ['学校类型筛选','小学、初中、九年一贯制仅用于筛选学校，不作为学校行展示字段。','state.recipientPickerSchoolType / filteredBureauSchools()']
@@ -1830,10 +1817,10 @@ PRD_FIELD_GROUPS.recipients=[
  ['动态部门','仅末级且存在有效成员的部门支持整选；发布后保留动态部门范围，填写资格、应提交人数和统计按当前有效成员解析。','isDynamicRecipientScope() / recipientScopeMembers() / surveyRecipientResolution()'],
  ['工作组选择','支持人员搜索、逐人选择和全选本组；选择结果按当时成员保存为明确人员，不作为动态工作组范围。','workgroupMemberMarkup() / setDraftPerson() / commitRecipientPicker()'],
  ['跨模块去重','同一 personId 可同时保留内部部门、工作组等来源；预计人数与发布人数全局只计算一次。','recipientResolvedSelection() / selectedRecipientSnapshot()'],
- ['问卷编辑','草稿与未开始问卷保存动态部门范围、明确人员及来源；再次编辑时保持原选择语义，搜索条件不写入问卷数据。','recipientSelections / recipientRules / explicitPersonIds / loadEditableSurveyState()'],
+ ['创建过程','新建步骤保存动态部门范围、明确人员及来源；跨步骤返回时保持原选择语义，搜索条件不写入问卷数据。','recipientSelections / recipientRules / explicitPersonIds'],
  ['发布数据','动态部门以 dynamic_department 范围写入发布数据；工作组及逐人选择写入明确人员，发布后仅动态部门随组织有效成员变化。','selectedRecipientSnapshot() / recipientSelectionContract()'],
  ['学校选择','教育局端学校行只展示学校名称与教职工人数；学校类型仅用于筛选，不在行内展示学段或类型。','schoolPickerMarkup() / filteredBureauSchools()'],
- ['详情数据范围','教育局端按教育局内部、工作组、学校、外部排序；学校端按学校内部、家长、班级、外部排序；仅展示实际命中项并以“ + ”连接，详情不展示发布渠道。','surveyDataScope()']
+ ['详情接收人员','详情完整展示已选人员或范围名称；外部填写追加“外部人员”，历史缺少结构化选择时回退原接收摘要。','surveyRecipientDisplayNames() / surveyRecipientItems() / target']
 ];
 PRD_FIELD_GROUPS.recipientPicker=[
  ['临时选择','打开 PC 弹窗或移动端分类页时复制当前模块数据；确定提交，取消、返回、遮罩关闭或 Escape 均回滚。','beginRecipientPicker() / commitRecipientPicker() / discardRecipientPicker()'],
@@ -1855,7 +1842,7 @@ renderRecipientPickerPrd=function(rule,key,entryType){
   ['工作组','明确人员','工作组支持搜索、逐人选择、全选本组和部分选择半选；全选保存当时有效成员，不保存动态工作组。','P0','搜索不改变选择结果'],
   ['事务交互','确认与回滚','确定仅提交当前模块；取消、返回、遮罩关闭或 Escape 不保存临时修改。','P0','移动端返回规则一致'],
   ['人员去重','多来源合并','相同 personId 只计一人，同时保留内部部门、工作组等全部来源。','P0','sourceCategories 记录来源'],
-  ['问卷编辑','原语义恢复','草稿与未开始问卷保存动态部门、明确人员及来源；再次编辑时完整回填。','P0','不得按 personId 覆盖分类'],
+  ['创建过程','原语义恢复','新建步骤保存动态部门、明确人员及来源；跨步骤返回时完整回填。','P0','不得按 personId 覆盖分类'],
   ['发布数据','范围与人员','动态部门原样保存并实时解析；工作组和逐人选择保存明确人员，发布后不随工作组成员变化扩围。','P0','兼容历史快照'],
   ['学校选择','精简列表','教育局端学校行只展示学校名称和教职工人数；学校类型仅保留为筛选条件。','P0','不展示学段或类型'],
   ['详情展示','动态范围文案','按当前端固定顺序组合实际范围，详情隐藏发布渠道。','P0','未知范围显示“—”']
@@ -1869,10 +1856,10 @@ PRD_FIELD_GROUPS.recipients=[
  ['教育局工作组','固定展示教育质量提升工作组、校园安全工作组、教育数字化工作组；成员分别为李静/周凯/陈洁、王明/吴敏、陈浩/刘洋。','RECIPIENT_WORKGROUP_TREE_V2'],
  ['工作组选择','支持人员搜索、逐人选择和全选本组；选择部分成员时显示半选，只有确定才提交当前模块。','workgroupMemberMarkup() / recipientScopeState() / commitRecipientPicker()'],
  ['跨模块去重','同一 personId 可保留内部部门、工作组等多个来源；预计人数和发布人数只计算一次。','recipientResolvedSelection() / selectedRecipientSnapshot()'],
- ['问卷编辑','草稿与未开始问卷保存范围及明确人员的选择键和来源，恢复时不得按 personId 覆盖跨模块来源。','recipientSelections / rawRecipientSelectionEntries() / loadEditableSurveyState()'],
+ ['创建过程','新建步骤保存范围及明确人员的选择键和来源，跨步骤恢复时不得按 personId 覆盖跨模块来源。','recipientSelections / rawRecipientSelectionEntries()'],
  ['发布快照','确认发布时按最新有效成员展开范围，按 personId 去重并固化；保存 sourceCategories、departmentSourceIds、workgroupSourceIds、workgroupIds 和 workgroupNames，发布后组织变化不回写。','selectedRecipientSnapshot()'],
  ['学校选择','教育局端学校行仅展示学校名称与教职工人数；学校类型只用于筛选，不在行内展示学段或类型。','schoolPickerMarkup() / filteredBureauSchools()'],
- ['详情数据范围','教育局端按教育局内部、工作组、学校、外部排序；学校端按学校内部、家长、班级、外部排序；详情不展示发布渠道。','surveyDataScope()']
+ ['详情接收人员','教育局端和学校端均完整展示已选人员或范围名称；外部填写追加“外部人员”，详情不再展示数据范围字段。','surveyRecipientDisplayNames() / surveyRecipientItems() / target']
 ];
 PRD_FIELD_GROUPS.recipientPicker=[
  ['临时选择','PC 弹窗和移动端分类页使用临时副本；确定提交，取消、返回、遮罩关闭或 Escape 回滚。','beginRecipientPicker() / commitRecipientPicker() / discardRecipientPicker()'],
@@ -1894,13 +1881,15 @@ renderRecipientPickerPrd=function(rule,key,entryType){
   ['成员选择','搜索与全选','工作组支持搜索、逐人选择、全选本组和部分选择半选；PC 与移动端一致。','P0','搜索不改变选择'],
   ['事务交互','确认与回滚','确定提交当前模块；取消、返回、遮罩关闭或 Escape 不保存临时修改。','P0','移动端返回同规则'],
   ['人员去重','多来源合并','相同 personId 只计一人，同时保留内部部门、工作组等全部来源。','P0','sourceCategories 记录来源'],
-  ['问卷编辑','原语义恢复','草稿与未开始问卷保存选择键及来源，再次编辑完整回填。','P0','不得按 personId 覆盖分类'],
+  ['创建过程','步骤内恢复','新建流程跨步骤返回时保留选择键及来源，已有问卷只读查看。','P0','不得按 personId 覆盖分类'],
   ['发布数据','快照固化','确认发布时展开范围并固化人员快照；发布后组织变化不回写。','P0','保存来源 ID 与工作组名称'],
   ['学校选择','精简列表','教育局端学校行只展示学校名称和教职工人数；学校类型仅保留为筛选条件。','P0','不展示学段或类型'],
-  ['详情展示','数据范围','按当前端固定顺序组合实际范围，详情隐藏发布渠道。','P0','未知范围显示“—”']
+  ['详情展示','接收人员','完整展示已选人员或范围名称，外部填写追加“外部人员”；详情删除数据范围字段。','P0','全部名称自动换行']
  ];
- return `<article class="prd-document"><header class="prd-document-head"><div><small>${entryType==='page'?'页面':'弹窗'}规则 · ${esc(key)}</small><h2>${esc(rule.title)}</h2></div><button type="button" class="prd-close" aria-label="关闭 PRD 规则">×</button></header><aside class="prd-prerequisite"><strong>实现口径</strong><p>编辑态保留范围选择语义，发布确认时按 personId 展开并固化人员快照；同一人员的多来源不得丢失。</p><small>PC 与移动端共用同一数据和校验规则。</small></aside><section><h3>1. 背景与目标</h3><p>${esc(rule.goal)}</p></section><section><h3>2. 用户与使用场景</h3><p>教育局及学校问卷创建人在 PC 或移动端组合选择接收对象，并准确查看各模块结果、预计人数和发布后的数据范围。</p></section><section><h3>3. 需求范围</h3><h4>In Scope</h4><p>接收模块、三个教育局工作组、人员搜索、整组与逐人选择、事务式确认、跨模块去重、草稿和未开始问卷恢复、发布快照、学校列表精简及详情数据范围。</p><h4>Out of Scope</h4><p>组织架构维护、工作组后台配置、后端接口和数据库迁移。</p></section><section><h3>4. 功能需求列表</h3>${prdTable(['功能模块','功能点','需求描述','优先级（P0 / P1 / P2）','备注说明'],features)}</section><section><h3>5. 核心流程与交互说明</h3><p>用户按模块打开选择器并在临时副本中操作；工作组可全选或逐人选择，部分选择显示半选。确定提交当前模块；发布确认时展开范围、按 personId 合并并固化快照。学校列表按名称或类型筛选，行内不展示学段或学校类型。</p>${prdTable(['字段/信息','限制与展示规则','当前原型来源'],rule.fields||[],'prd-field-table')}</section><section><h3>6. 异常场景与边界条件</h3><p>无有效成员的范围不可选择；范围删除或越权时阻止发布；取消类操作不污染正式选择；相同人员多模块命中只计一人但保留全部来源；无内部范围且未开启外部填写时阻止发布。</p></section><section><h3>7. 数据口径与埋点需求</h3><p>编辑态使用 category、scopeId、personId 和 sourceScopeIds；发布快照保存 sourceCategories、departmentSourceIds、workgroupSourceIds、workgroupIds、workgroupNames、frozen 和 snapshotAt。人数按 personId 去重。记录 recipient_picker_open、recipient_person_select、recipient_scope_select、recipient_picker_confirm、recipient_picker_cancel 和 recipient_publish_validation_failed；【假设】公共属性包含 portal、device、category、scope_id、person_id、selected_count 和 timestamp。</p></section><section><h3>8. 风险、依赖与限制</h3><p>【假设】正式环境由统一身份和组织服务提供稳定 personId、部门及工作组关系；发布接口必须在同一事务中校验范围并固化快照。</p></section><section><h3>9. 验收标准</h3><p>教育局端仅展示三个指定工作组；PC 与移动端通过搜索、逐人、全选、半选和全部取消路径；同一人员跨内部部门与工作组只计一次且快照保留两个来源；草稿和未开始问卷重新编辑完整回填；学校行不展示学段或类型；详情范围顺序准确且不展示发布渠道。</p></section></article>`
+ return `<article class="prd-document"><header class="prd-document-head"><div><small>${entryType==='page'?'页面':'弹窗'}规则 · ${esc(key)}</small><h2>${esc(rule.title)}</h2></div><button type="button" class="prd-close" aria-label="关闭 PRD 规则">×</button></header><aside class="prd-prerequisite"><strong>实现口径</strong><p>新建过程保留范围选择语义，发布确认时按 personId 展开并固化人员快照；同一人员的多来源不得丢失。</p><small>PC 与移动端共用同一数据和校验规则。</small></aside><section><h3>1. 背景与目标</h3><p>${esc(rule.goal)}</p></section><section><h3>2. 用户与使用场景</h3><p>教育局及学校问卷创建人在 PC 或移动端组合选择接收对象，并准确查看各模块结果、预计人数和发布后的数据范围。</p></section><section><h3>3. 需求范围</h3><h4>In Scope</h4><p>接收模块、三个教育局工作组、人员搜索、整组与逐人选择、事务式确认、跨模块去重、新建步骤内状态恢复、发布快照、学校列表精简及详情数据范围。</p><h4>Out of Scope</h4><p>已有问卷修改、组织架构维护、工作组后台配置、后端接口和数据库迁移。</p></section><section><h3>4. 功能需求列表</h3>${prdTable(['功能模块','功能点','需求描述','优先级（P0 / P1 / P2）','备注说明'],features)}</section><section><h3>5. 核心流程与交互说明</h3><p>用户按模块打开选择器并在临时副本中操作；工作组可全选或逐人选择，部分选择显示半选。确定提交当前模块；发布确认时展开范围、按 personId 合并并固化快照。学校列表按名称或类型筛选，行内不展示学段或学校类型。</p>${prdTable(['字段/信息','限制与展示规则','当前原型来源'],rule.fields||[],'prd-field-table')}</section><section><h3>6. 异常场景与边界条件</h3><p>无有效成员的范围不可选择；范围删除或越权时阻止发布；取消类操作不污染正式选择；相同人员多模块命中只计一人但保留全部来源；无内部范围且未开启外部填写时阻止发布。</p></section><section><h3>7. 数据口径与埋点需求</h3><p>新建草稿状态使用 category、scopeId、personId 和 sourceScopeIds；发布快照保存 sourceCategories、departmentSourceIds、workgroupSourceIds、workgroupIds、workgroupNames、frozen 和 snapshotAt。人数按 personId 去重。记录 recipient_picker_open、recipient_person_select、recipient_scope_select、recipient_picker_confirm、recipient_picker_cancel 和 recipient_publish_validation_failed；【假设】公共属性包含 portal、device、category、scope_id、person_id、selected_count 和 timestamp。</p></section><section><h3>8. 风险、依赖与限制</h3><p>【假设】正式环境由统一身份和组织服务提供稳定 personId、部门及工作组关系；发布接口必须在同一事务中校验范围并固化快照。</p></section><section><h3>9. 验收标准</h3><p>教育局端仅展示三个指定工作组；PC 与移动端通过搜索、逐人、全选、半选和全部取消路径；同一人员跨内部部门与工作组只计一次且快照保留两个来源；新建过程中跨步骤返回可完整恢复；已有问卷仅支持查看；学校行不展示学段或类型；详情范围顺序准确且不展示发布渠道。</p></section></article>`
 };
+const recipientDetailBaseRenderRecipientPickerPrd=renderRecipientPickerPrd;
+renderRecipientPickerPrd=function(rule,key,entryType){return recipientDetailBaseRenderRecipientPickerPrd(rule,key,entryType).replace(/详情数据范围/g,'详情接收人员').replace(/详情范围顺序准确且不展示发布渠道/g,'详情接收人员完整展示且不重复')};
 const RECIPIENT_V16_APPROVED_CONTRACT=Object.freeze({
  recipientDeepClone,isDynamicRecipientScope,recipientDirectoryPerson,recipientScopeMembers,recipientScopeIsInvalid,normalizeRecipientMap,recipientResolvedSelection,recipientSelectionContract,
  setDraftDynamicScope,setDraftPerson,recipientPersonSelectedInScope,recipientPersonCovered,recipientPersonPickerState,recipientScopeState,recipientCategoryCount,recipientCount,
@@ -1913,22 +1902,23 @@ const RECIPIENT_V16_APPROVED_CONTRACT=Object.freeze({
 
 const PRD_V16_PROFILES={
  management:{
-  users:'教育局或学校的问卷创建人，在 PC 端检索本人收到或发布的问卷，并按状态执行允许的操作。',
-  inScope:'我收到的、我发布的、组合筛选、真实分页、状态操作矩阵、草稿与未开始问卷编辑，以及仅草稿和已暂停问卷的删除确认与软删除。',
-  outScope:'移动端我的问卷列表、后端审批流、数据库物理删除和跨组织问卷操作。',
+  users:'教育局或学校的问卷创建人，在 PC 或移动端检索本人收到或发布的问卷，并只读查看已有问卷。',
+  inScope:'我收到的、我发布的、组合筛选、真实分页、已有问卷只读详情、旧编辑路由拦截，以及仅草稿和已暂停问卷的删除确认与软删除。',
+  outScope:'已有问卷内容修改、后端审批流、数据库物理删除和跨组织问卷操作。',
   features:[
    ['问卷查询','组合筛选','按问卷名称、创建人、问卷类型和状态筛选；我收到的与我发布的条件互不串用。','P0','输入最多 50 字'],
    ['状态操作','操作矩阵','操作项按草稿、未开始、进行中、已暂停、已结束分别输出；不符合状态的入口不得渲染。','P0','二维码仅适用于非内部渠道'],
    ['类型展示','历史快照','问卷列表与详情优先展示创建或主动改选时保存的类型名称，不受类型后续改名或删除影响。','P0','筛选项仅包含当前有效类型'],
-   ['问卷编辑','原记录更新','草稿与未开始问卷按四步流程完整回填；保存或发布沿用原问卷 ID，不新增重复记录。','P0','状态变化时拒绝保存'],
+   ['问卷查看','已有数据只读','草稿、未开始、进行中、已暂停和已结束问卷均只进入只读详情，不提供编辑或修改入口。','P0','PC 与移动端一致'],
+   ['路由拦截','旧编辑地址','访问 list/edit/{surveyId} 时转换到只读详情，不加载编辑表单、不写入原数据。','P0','构造事件同样只读'],
    ['问卷删除','确认与软删除','仅草稿和已暂停问卷可删除；删除前二次确认，确认后从我的问卷、问卷管理、统计及云首页数据源移除。','P0','未开始、进行中、已结束不可删除'],
    ['列表分页','真实分页','PC 支持每页 10、20、50、100 条并正确禁用首尾翻页；移动端不展示分页控件。','P1','筛选后回到第 1 页']
   ],
-  flow:'进入“我的问卷”后选择“我收到的”或“我发布的”，配置筛选条件并查看结果；点击操作后先校验问卷归属与实时状态，再进入详情、编辑、统计或确认操作。',
-  exceptions:'问卷不存在、已删除、非当前创建人或状态已变化时阻止操作并展示明确反馈；删除确认回调须再次校验实时状态为草稿或已暂停；筛选无结果展示空态；最后一页记录减少后页码回退到有效页。',
-  data:'列表仅返回当前组织且当前用户有权访问的未删除问卷。问卷类型读取 surveyTypeName 历史快照，只有旧数据补齐阶段可由有效 surveyTypeId 写入一次。提交人数为内部有效提交与外部有效提交之和。记录 survey_filter、survey_view_switch、survey_action_click、survey_delete_confirm、survey_edit_save；【假设】公共属性包含 portal、org_id、user_id、survey_id、survey_type_id、status、action、timestamp。',
-  risks:'正式环境依赖问卷权限、状态机和乐观锁。所有编辑、暂停、恢复、结束和删除请求均须由服务端重新校验组织、创建人及当前状态；查询层不得联表覆盖 surveyTypeName 历史快照。',
-  acceptance:'两端 PC 的筛选、分页及五种状态操作项一致；类型改名或删除后历史问卷仍显示原快照并保留在“全部”结果中；草稿与未开始编辑完整回填且更新原记录；草稿和已暂停可删除，未开始、进行中与已结束不可删除；删除后各列表同步移除；取消确认时数据不变。'
+  flow:'进入“我的问卷”后选择“我收到的”或“我发布的”，配置筛选条件并查看结果；点击“查看”进入只读详情。旧编辑地址、设备切换和构造编辑事件均转换为查看，不进入编辑流程。',
+  exceptions:'问卷不存在、已删除或无查看权限时展示明确反馈；旧编辑地址不得回退加载编辑表单；删除确认回调须再次校验实时状态为草稿或已暂停；筛选无结果展示空态。',
+  data:'列表仅返回当前组织且当前用户有权访问的未删除问卷。已有问卷读取历史快照，不提供更新接口；提交人数为内部有效提交与外部有效提交之和。记录 survey_filter、survey_view_switch、survey_view、survey_delete_confirm；【假设】公共属性包含 portal、org_id、user_id、survey_id、survey_type_id、status、action、timestamp。',
+  risks:'正式环境依赖问卷查看权限和状态机。服务端必须拒绝已有问卷内容更新请求；暂停、恢复、结束和删除仍须重新校验组织、创建人及当前状态。',
+  acceptance:'教育局端、学校端的 PC 与移动端已有问卷均只支持查看；所有状态均无编辑或修改入口；旧编辑地址和构造事件不能加载编辑表单或覆盖原数据；允许的新建问卷流程不受影响。'
  },
  response:{
   users:'问卷接收人或通过有效二维码进入的外部填写人，在 PC 或移动端填写、提交及查看答卷。',
@@ -1968,40 +1958,42 @@ const PRD_V16_PROFILES={
   acceptance:'内部有效答卷可查看且题目顺序、答案和提交信息准确；外部、失效、已删除或跨组织答卷均无法通过列表或直链访问；返回路径正确。'
  },
  directory:{
-  users:'具有组织问卷查看权限的教育局或学校用户，在 PC 端通过“问卷管理”浏览组织问卷、问卷配置及内部人员答卷。',
-  inScope:'已发布问卷的组织级筛选、分页、只读详情、接收数据范围、题目结构、内部答卷列表和答卷详情。',
+  users:'具有组织问卷查看权限的教育局或学校用户，在 PC 或移动端通过“问卷管理”浏览组织问卷、问卷配置及内部人员答卷。',
+  inScope:'PC 与移动端已发布问卷的组织级筛选、只读详情、完整接收人员、题目结构、内部答卷列表和答卷详情；PC 保留分页。',
   outScope:'草稿展示、问卷编辑、外部人员答卷明细、跨组织数据、已删除问卷恢复和统计口径配置。',
   features:[
    ['问卷管理','组织范围列表','仅展示当前组织内已发布且未删除的问卷，草稿仅保留在“我的问卷”；支持名称、创建人、日期和状态筛选。','P0','状态筛选不提供草稿选项'],
-   ['问卷详情','配置只读','展示基础信息、收集设置、实际接收范围和题目，不提供编辑入口。','P0','不展示发布渠道'],
+   ['问卷详情','配置只读','PC 与移动端均展示基础信息、收集设置、完整接收人员和题目，不提供编辑或修改入口。','P0','不展示数据范围字段'],
+   ['接收人员','完整回显','明确人员展示姓名，范围选择展示范围名称；外部填写追加“外部人员”，全部名称自动换行且不折叠。','P0','历史数据回退原 target'],
+   ['访问控制','禁止更新','旧编辑地址、设备切换及构造更新事件均只进入只读详情，不回填编辑表单、不覆盖原数据。','P0','前后端均须限制'],
    ['答卷明细','内部人员限定','仅内部人员有效提交可进入答卷详情；外部答卷不得生成或命中详情路由。','P0','与统计明细同口径'],
    ['统计入口','上下文返回','从列表进入统计详情时记录返回来源，返回后保留列表上下文。','P1','教育局与学校一致']
   ],
-  flow:'用户在“问卷管理”筛选组织问卷，进入问卷详情查看配置与内部答卷列表；点击内部答卷查看题目答案，或进入统计详情；返回时回到原列表或详情。',
-  exceptions:'问卷或答卷不存在、已删除、不属于当前组织、外部答卷或动态参数非法时展示无权查看空态；不得回退为其他问卷数据。',
-  data:'问卷列表按当前组织、status!=draft 和 deleted!=1 条件过滤。答卷详情按 surveyId、responseId、内部人员标识联合查询。记录 survey_directory_filter、survey_detail_open、response_detail_open；【假设】公共属性包含 org_id、survey_id、response_id、source_page、timestamp。',
-  risks:'正式环境须由服务端执行组织级数据权限和答卷级权限校验；前端隐藏外部详情入口不能替代接口拒绝。',
-  acceptance:'两端问卷管理列表均不展示草稿且无草稿筛选项，草稿仍在“我的问卷”的“我发布的”中展示；其他状态筛选和分页正确；详情字段与发布快照一致；内部答卷可查看，外部、已删除及跨组织答卷均无法通过直链访问。'
+  flow:'用户在 PC 或移动端进入“问卷管理”，筛选组织问卷并进入只读详情查看配置与内部答卷列表；点击内部答卷查看题目答案，或进入统计详情；返回时回到原列表或详情。',
+  exceptions:'问卷或答卷不存在、已删除、不属于当前组织、外部答卷或动态参数非法时展示无权查看空态；直接访问旧编辑地址或构造更新事件时必须转为只读查看，不得回退为其他问卷数据或加载编辑表单。',
+  data:'问卷列表按当前组织、status!=draft 和 deleted!=1 条件过滤。详情接收人员从 recipientRules、explicitPersonIds、recipientSnapshot 解析并按稳定 ID 去重；外部渠道补充“外部人员”，结构化数据缺失时回退 target。已有问卷配置仅提供查询，不提供更新写入；答卷详情按 surveyId、responseId、内部人员标识联合查询。记录 survey_directory_filter、survey_detail_open、response_detail_open，不记录 survey_edit_save；【假设】公共属性包含 org_id、survey_id、response_id、source_page、timestamp。',
+  risks:'正式环境须由服务端执行组织级数据权限、答卷级权限及已有问卷更新拒绝；前端隐藏编辑入口不能替代接口拒绝。',
+  acceptance:'教育局端、学校端的 PC 与移动端问卷管理均只能查看已有问卷，所有状态均无编辑或修改入口，旧编辑地址和构造事件不能覆盖原数据；详情不展示数据范围，接收人员完整展示已选姓名或范围名称并在适用时显示一次“外部人员”；内部答卷可查看，外部、已删除及跨组织答卷均无法通过直链访问。'
  },
  basic:{
-  users:'问卷创建人或模板维护人，在新增、编辑草稿、编辑未开始问卷或维护模板时录入基础信息。',
-  inScope:'标题、问卷类型、说明、实时草稿状态、步骤导航和基础字段校验。',
+  users:'问卷创建人或模板维护人，在新建问卷或维护模板时录入基础信息。',
+  inScope:'新问卷标题、问卷类型、说明、创建过程状态、步骤导航和基础字段校验。',
   outScope:'题目编辑、接收对象、收集设置、统计和后端类型维护。',
  features:[
    ['基础信息','标题','标题必填，去除首尾空格，最多 50 个字符。','P0','错误停留第 1 步'],
-   ['基础信息','问卷类型快照','新建问卷选择有效类型后同时保存 surveyTypeId 与 surveyTypeName；已有问卷未主动改选时保留原快照，主动选择有效类型后更新两项快照。','P0','改名、删除不回写历史问卷'],
+   ['基础信息','问卷类型快照','新建问卷选择有效类型后同时保存 surveyTypeId 与 surveyTypeName；创建完成后仅支持查看，类型改名或删除不回写。','P0','历史问卷禁止修改'],
    ['模板信息','动态类型关联','模板仅保存有效 surveyTypeId；类型为空时允许进入基础信息，但重新选择有效类型前不得保存模板或新问卷。','P0','模板不保存展示名称快照'],
    ['基础信息','填写说明','说明选填，最多 500 个字符。','P1','PC 与移动端一致'],
-   ['编辑回填','原值恢复','编辑时恢复标题、类型和说明，并与后续步骤使用同一草稿状态。','P0','不得创建重复记录']
+   ['只读边界','已有问卷','已有问卷仅展示原标题、类型、说明和配置，不提供回填编辑或保存入口。','P0','PC 与移动端一致']
   ],
-  flow:'进入基础信息步骤后录入或修改字段；点击下一步先采集输入并校验，通过后进入问卷设计。普通问卷继续后续配置，模板在问卷设计步骤直接保存。',
-  exceptions:'问卷标题或模板名称为空、超长时阻止进入下一步；新建问卷、模板或模板创建流程未选择有效类型时阻止保存；已有问卷原类型已改名或删除且未主动改选时仍可保留原快照继续编辑；编辑对象不存在、已删除、越权或状态变化时退出编辑并提示。',
-  data:'问卷保存 title、description、surveyTypeId、surveyTypeName，其中 surveyTypeName 为权威历史快照；模板仅保存 surveyTypeId。上线前对仍可解析有效类型的历史问卷补齐一次名称快照，此后不得自动刷新。记录 create_basic_open、create_basic_next、create_basic_validation_failed、survey_type_snapshot_changed；【假设】公共属性包含 portal、survey_id、template_id、edit_mode、field_name、survey_type_id、timestamp。',
-  risks:'正式环境依赖类型有效状态、历史数据一次性补齐和并发编辑控制；服务端必须区分问卷快照与模板动态关联，禁止读取当前类型名称覆盖历史问卷。',
-  acceptance:'新建问卷固化类型 ID 与名称；类型改名或删除后已有问卷保持原名称且可继续下发；编辑时不改类型保留快照，主动改选后更新快照；模板或模板创建流程缺少有效类型时必须重新选择；PC 与移动端规则一致。'
+  flow:'进入新建基础信息步骤后录入字段；点击下一步先采集输入并校验，通过后进入问卷设计。问卷创建后只能进入详情查看，模板仍按模板中心规则维护。',
+  exceptions:'问卷标题或模板名称为空、超长时阻止进入下一步；新建问卷、模板或模板创建流程未选择有效类型时阻止保存；已有问卷编辑地址被访问时改为只读详情，禁止覆盖原值。',
+  data:'新问卷保存 title、description、surveyTypeId、surveyTypeName，其中 surveyTypeName 为权威历史快照；模板仅保存 surveyTypeId。已有问卷不提供更新写入。记录 create_basic_open、create_basic_next、create_basic_validation_failed；【假设】公共属性包含 portal、survey_id、template_id、field_name、survey_type_id、timestamp。',
+  risks:'正式环境依赖类型有效状态与历史数据一次性补齐；服务端必须拒绝已有问卷更新请求，并区分问卷快照与模板动态关联。',
+  acceptance:'新建问卷固化类型 ID 与名称；类型改名或删除后已有问卷保持原名称；PC 与移动端已有问卷均只能查看，旧编辑地址不能覆盖原数据；模板缺少有效类型时必须重新选择。'
  },
  editor:{
-  users:'问卷创建人在 PC 或移动端直接编辑题目结构；模板维护人在 PC 端编辑模板题目。',
+  users:'问卷创建人在 PC 或移动端设计新问卷题目结构；模板维护人在 PC 端编辑模板题目。',
   inScope:'双栏设计器、完整题目卡片、题型只读展示、题库添加、题目与选项排序、必答和专属设置、复制删除及统一校验。',
   outScope:'复杂逻辑跳转、矩阵题、评分题、题库后台维护、真实文件上传及协同编辑。',
   features:[
@@ -2017,7 +2009,7 @@ const PRD_V16_PROFILES={
    exceptions:'题目为空、超过 100 题、标题为空或超长、选择题选项少于 2 项、超过 20 项、选项为空或超长时阻止继续；用户需要更换题型时删除原题并重新添加；拖拽取消或落点无效时保持原顺序。',
    data:'题目保存 id、type、title、required、options、imageOnly、includeTime。记录 question_add、question_reorder、question_copy、question_delete、question_setting_change、question_validation_failed；【假设】公共属性包含 survey_id、template_id、question_id、question_type、from_index、to_index、timestamp。',
   risks:'触摸拖动须避免抢占输入、开关和菜单事件；结构变更须保持稳定题目 ID；正式保存依赖版本号防止覆盖并发编辑。',
-   acceptance:'新增问卷、草稿编辑、未开始编辑和 PC 模板维护均无右侧设置栏；七种题型加入后仅展示只读类型且无法打开下拉或改变题型；复制、模板加载和草稿恢复保留原题型与完整结构；专属设置可回填；题目与选项排序正确；所有保存入口使用同一校验。'
+   acceptance:'新增问卷和 PC 模板维护均无右侧设置栏；七种题型加入后仅展示只读类型且无法打开下拉或改变题型；复制和模板加载保留原题型与完整结构；题目与选项排序正确；已有问卷在 PC 与移动端均不进入题目编辑器。'
  },
  collection:{
   users:'问卷创建人，在 PC 或移动端配置发布范围、收集周期及提醒。',
@@ -2025,12 +2017,12 @@ const PRD_V16_PROFILES={
   outScope:'真实节假日日历、消息发送任务、二维码短链服务、历史问卷补录和数据库迁移。',
   features:[
    ['外部填写','发布范围','开启后支持二维码填写；内部接收范围与外部填写至少满足一项。','P0','支持纯内部、混合和纯外部'],
-   ['收集方式','两种提交频次','支持仅提交一次、每日收集一次；切换后规范化不适用字段。','P0','问卷新建与编辑共用'],
+   ['收集方式','两种提交频次','支持仅提交一次、每日收集一次；切换后规范化不适用字段。','P0','仅用于新建问卷'],
    ['收集日期','业务时区','开始和截止日期必填且有序；按 Asia/Shanghai 自然日计算问卷状态。','P0','日期格式 YYYY-MM-DD'],
    ['每日规则','开关联动','非每日方式隐藏三项每日配置并清空；每日模式显示非工作日与提醒，开启提醒后显示提醒时间。','P0','默认提醒时间 09:15'],
    ['发布校验','范围与时间','发布或保存前统一校验接收范围、日期和提醒时间。','P0','错误不改变原数据']
   ],
-  flow:'进入收集设置后确认接收人员，配置外部填写、收集方式和日期；每日模式继续配置非工作日及提醒。提交前规范化字段并统一校验，通过后发布或更新原问卷。',
+  flow:'新建问卷进入收集设置后确认接收人员，配置外部填写、收集方式和日期；每日模式继续配置非工作日及提醒。提交前规范化字段并统一校验，通过后发布新问卷；已有问卷不进入该流程。',
   exceptions:'内部范围和外部填写均为空、日期缺失、截止早于开始、每日提醒开启但时间为空时阻止提交；切回任一非每日方式时隐藏三项每日设置，并将字段保存为 false、false、空。',
   data:'保存 allowExternal、frequency、startDate、endDate、skipNonWorkday、dailyReminder、reminderTime。记录 collection_setting_change、recipient_publish_validation_failed、survey_publish、survey_status_auto_changed；【假设】公共属性包含 survey_id、frequency、status、start_date、end_date、timestamp。',
   risks:'真实非工作日判断和提醒依赖服务端日历、调度和消息系统；多端必须使用统一业务时区和幂等发布接口。',
@@ -2178,14 +2170,14 @@ resource:{
   features:[
    ['填写列表','可见状态','按未填写和已填写查看本人问卷；未开始问卷不进入填写人员列表，开始日自动转为进行中后才可见。','P0','仅当前用户接收范围'],
    ['问卷访问','状态校验','点击时重新校验未删除、接收资格、问卷状态和提交频次。','P0','直链同样校验'],
-   ['页面跳转','填写与查看','未提交进入填写；已有有效答卷进入查看；符合条件时可修改。','P0','保留返回路径'],
+   ['页面跳转','填写与查看','未提交进入填写；已有有效答卷仅进入只读查看，不提供修改或再次保存。','P0','保留返回路径'],
     ['云首页','最新问卷','仅从当前填写人员可见问卷中展示最新一条，未开始问卷不展示。','P1','与移动填写列表共用可见口径']
   ],
-   flow:'进入移动填写列表并选择状态；点击问卷后校验访问资格，进入填写或答卷查看；返回时回到原筛选。移动云首页展示当前组织最新五条已发布问卷，点击进入统计详情。',
+   flow:'进入移动填写列表并选择状态；点击问卷后校验访问资格，未提交时进入填写，已有答卷时进入只读查看；返回时回到原筛选。移动云首页仅展示当前填写人员可见的最新一条问卷。',
   exceptions:'未开始问卷不进入列表，直接访问旧链接时展示通用不可访问空态；暂停、结束、删除、移出接收范围或已达提交上限时禁止新增提交；无结果展示空态。',
   data:'列表仅包含当前填写人员有接收资格、deleted!=1 且状态为 running、paused 或 ended 的问卷；移动云首页复用同一数据源。记录 mobile_fill_filter、mobile_survey_open、mobile_access_denied；【假设】公共属性包含 user_id、survey_id、fill_status、survey_status、timestamp。',
   risks:'接收范围为动态组织时须在每次进入和提交前实时解析；移动缓存不得绕过状态及权限变化。',
-   acceptance:'两端移动列表和移动云首页均不展示未开始问卷；到达开始日并自动转为进行中后按接收资格展示；PC“我收到的”同步隐藏未开始状态与筛选项；发布人管理、统计和二维码入口仍可展示未开始问卷；旧链接不可绕过可见状态。'
+   acceptance:'两端移动列表和移动云首页均不展示未开始问卷；到达开始日并自动转为进行中后按接收资格展示；已提交答卷只能查看且不得修改；PC“我收到的”同步隐藏未开始状态与筛选项；发布人管理、统计和二维码入口仍可展示未开始问卷；旧链接不可绕过可见状态或只读限制。'
  },
  qr:{
   users:'问卷发布人查看或下载外部填写二维码，外部填写人通过扫码进入问卷。',
@@ -2252,7 +2244,7 @@ function renderPrdV16Document(rule,key,entryType){
  const profile=prdV16Profile(key,entryType),features=prdTable(['功能模块','功能点','需求描述','优先级（P0 / P1 / P2）','备注说明'],profile.features),fields=prdTable(['字段/信息','限制与展示规则','当前原型来源'],rule.fields||[],'prd-field-table');
  return `<article class="prd-document" data-prd-version="${PRD_CURRENT_VERSION}"><header class="prd-document-head"><div><small>${entryType==='page'?'页面':'弹窗'}规则 · ${esc(key)}</small><h2>${esc(rule.title)}</h2></div><button type="button" class="prd-close" aria-label="关闭 PRD 规则">×</button></header><div class="prd-version-note">PRD ${PRD_CURRENT_VERSION} · 更新日期 ${PRD_CURRENT_DATE}</div><section><h3>1. 背景与目标</h3><p>${esc(rule.goal)}</p></section><section><h3>2. 用户与使用场景</h3><p>${profile.users}</p></section><section><h3>3. 需求范围</h3><h4>In Scope</h4><p>${profile.inScope}</p><h4>Out of Scope</h4><p>${profile.outScope}</p></section><section><h3>4. 功能需求列表</h3>${features}</section><section><h3>5. 核心流程与交互说明</h3><p>${profile.flow}</p>${fields}</section><section><h3>6. 异常场景与边界条件</h3><p>${profile.exceptions}</p></section><section><h3>7. 数据口径与埋点需求</h3><p>${profile.data}</p><p>PRD 入口记录 prd_entry_expose、prd_rule_open、prd_rule_close，公共属性包含 portal、device、page_key、overlay_key、entry_type、close_method 和 timestamp。</p></section><section><h3>8. 风险、依赖与限制</h3><p>${profile.risks}</p></section><section><h3>9. 验收标准</h3><p>${profile.acceptance}</p></section></article>`
 }
-function stampPrdVersion(html){let output=html.replace(/V1\.8 选择与计数口径/g,'V1.10 选择与计数口径').replace(/V1\.9 选择与计数口径/g,'V1.10 选择与计数口径').replace(/V1\.11 选择与计数口径/g,'V1.10 选择与计数口径');if(!output.includes('data-prd-version='))output=output.replace(/<article class="([^"]*\bprd-document\b[^"]*)">/,`<article class="$1" data-prd-version="${PRD_CURRENT_VERSION}">`);if(!output.includes('prd-version-note'))output=output.replace('</header>',`</header><div class="prd-version-note">PRD ${PRD_CURRENT_VERSION} · 更新日期 ${PRD_CURRENT_DATE}</div>`);return output}
+function stampPrdVersion(html){let output=html.replace(/V1\.8 选择与计数口径/g,'V1.10 选择与计数口径').replace(/V1\.9 选择与计数口径/g,'V1.10 选择与计数口径').replace(/V1\.11 选择与计数口径/g,'V1.10 选择与计数口径').replace(/编辑态保存范围语义/g,'创建态保存范围语义').replace(/编辑态范围对象/g,'创建态范围对象').replace(/问卷编辑请求示例/g,'问卷创建请求示例').replace(/草稿和未开始问卷恢复/g,'新建过程跨步骤恢复').replace(/草稿与未开始问卷恢复/g,'新建过程跨步骤恢复').replace(/草稿和未开始问卷重新编辑回填完整/g,'新建过程中跨步骤返回可完整回填').replace(/草稿与未开始问卷重新编辑完整回填/g,'新建过程中跨步骤返回可完整回填');if(!output.includes('data-prd-version='))output=output.replace(/<article class="([^"]*\bprd-document\b[^"]*)">/,`<article class="$1" data-prd-version="${PRD_CURRENT_VERSION}">`);if(!output.includes('prd-version-note'))output=output.replace('</header>',`</header><div class="prd-version-note">PRD ${PRD_CURRENT_VERSION} · 更新日期 ${PRD_CURRENT_DATE}</div>`);return output}
 const prdV16BaseRenderPrdDocument=renderPrdDocument;
 renderPrdDocument=function(rule,key,entryType){
  const isCloud=entryType==='page'&&['cloud-widget','mobile-widget'].includes(key),isRecipient=(entryType==='page'&&['create-recipients','mobile-recipients'].includes(key))||(entryType==='overlay'&&key==='recipient-picker');
@@ -2834,3 +2826,11 @@ if(typeof window!=='undefined'){
  });
  if(typeof window.setTimeout==='function')window.setTimeout(()=>restoreTemplateContentOnlyContract(true),0);
 }
+
+function enforceSurveyReadonlyContract(){
+ Object.values(CONFIG).forEach(config=>config.surveys.forEach(survey=>{survey.allowModify=false}));
+ state.allowModify=false;
+ if(document.documentElement?.dataset)document.documentElement.dataset.surveyManagement='readonly-v1';
+}
+enforceSurveyReadonlyContract();
+document.addEventListener('DOMContentLoaded',enforceSurveyReadonlyContract);

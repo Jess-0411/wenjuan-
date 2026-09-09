@@ -1113,7 +1113,8 @@
     if (typeof PRD_FIELD_GROUPS === 'undefined') return;
     PRD_FIELD_GROUPS.surveyDetail = [
       ['问卷标题/类型/状态', '只读；已删除、不属于当前组织或动态 ID 非法时展示不可用空态。', 's.title / surveyTypeLabel(s) / s.status'],
-      ['创建与收集信息', '展示创建人、创建时间、接收人员、填写周期和按当前动态范围解析的数据范围。', 's.owner / s.createdAt / s.target / surveyDataScope(s)'],
+      ['创建与收集信息', '展示创建人、创建时间和填写周期；详情不展示数据范围字段。', 's.owner / s.createdAt / s.time'],
+      ['接收人员', '完整展示发布时选择的人员姓名或范围名称；外部填写追加“外部人员”，按稳定 ID 去重并自动换行。', 'surveyRecipientDisplayNames(s) / surveyRecipientItems(s) / s.target'],
       ['已提交', '仅统计内部接收人员的有效提交人数，不包含外部人员提交。', 'statsSnapshot(s).internalDone'],
       ['未提交', 'max(0，应提交内部人数 - 内部有效提交数)；不计外部人员；无内部应提交人数时为“—”。', 'statsSnapshot(s).pending'],
       ['外部提交数', '统计外部人员通过微信扫描二维码提交的有效问卷份数，不提供人员明细。', 'statsSnapshot(s).externalDone'],
