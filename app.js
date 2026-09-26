@@ -245,7 +245,7 @@ const PRD_FIELD_GROUPS={
 const prdFields=(...groups)=>groups.flatMap(key=>PRD_FIELD_GROUPS[key]||[]);
 const PRD_PAGE_RULES={
  'cloud-widget':{title:'问卷调研首页统计组件｜数据与后端实现规则',goal:'明确教育局 PC 首页统计组件的数据来源、统计周期、计算公式、接口和权限规则。',fields:[]},
- 'mobile-widget':{title:'问卷调研首页组件｜数据与后端实现规则',goal:'明确移动端两项统计与最新五条组织问卷的数据来源、状态、跳转、空态、接口和权限规则。',fields:[]},
+ 'mobile-widget':{title:'问卷调研首页组件｜数据与后端实现规则',goal:'明确移动端两项统计与最新三条组织问卷的数据来源、状态、跳转、空态、接口和权限规则。',fields:[]},
  list:{title:'我的问卷',goal:'筛选、查看并操作本人收到或发布的问卷。',fields:prdFields('surveyFilters','surveyList','pagination')},
  'list-response':{title:'本人答卷',goal:'查看当前用户的有效答卷及历次提交记录。',fields:prdFields('surveyList','response')},
  'list-fill':{title:'填写答卷',goal:'新增并提交一份答卷，提交成功后仅支持查看。',fields:prdFields('response')},
@@ -339,7 +339,7 @@ function renderPrdDocument(rule,key,entryType){
  return `<article class="prd-document"><header class="prd-document-head"><div><small>${entryType==='page'?'页面':'弹窗'}规则 · ${esc(key)}</small><h2>${esc(rule.title)}</h2></div><button type="button" class="prd-close" aria-label="关闭 PRD 规则">×</button></header>${prerequisite}<section><h3>1. 背景与目标</h3><p>${esc(rule.goal)}</p></section><section><h3>2. 用户与使用场景</h3><p>供产品、设计、前端、后端和测试人员在当前原型上下文中核对界面规则。</p></section><section><h3>3. 需求范围</h3><h4>In Scope</h4><p>当前${entryType==='page'?'页面':'覆盖层'}的字段、展示、操作、状态和异常规则。</p><h4>Out of Scope</h4><p>${outScopeText}</p></section><section><h3>4. 功能需求列表</h3>${features}</section><section><h3>5. 核心流程与交互说明</h3><p>${flowText}</p>${fields}</section><section><h3>6. 异常场景与边界条件</h3><p>${exceptionText}</p></section><section><h3>7. 数据口径与埋点需求</h3><p>${dataText}</p></section><section><h3>8. 风险、依赖与限制</h3><p>${riskText}</p></section><section><h3>9. 验收标准</h3><p>${acceptanceText}</p></section></article>`
 }
 function renderCloudWidgetPrd(rule,key){return '<article class="prd-document cloud-widget-prd"><header class="prd-document-head"><h2>云首页组件规则</h2><button class="prd-close" aria-label="关闭 PRD 规则">×</button></header>'+cloudWidgetRules()+'</article>'}
-function cloudWidgetRules(){return `<section><h3>1. 背景与目标</h3><p>删除教育局端、学校端应用首页模块，在云首页按设备提供精简统计与高频问卷入口。</p></section><section><h3>2. 用户与使用场景</h3><p>教育局与学校授权用户在 PC 云首页查看组织问卷概览，在移动云首页查看本人当前可见的最新问卷。</p></section><section><h3>3. 需求范围</h3><h4>In Scope</h4><p>两端首页入口删除、两项统计、PC 最新五条组织问卷、移动端本人最新一条可见问卷、截止日期及对应跳转。</p><h4>Out of Scope</h4><p>移动端我的问卷列表、问卷创建表单、其他页面时间字段调整及后端接口实现。</p></section><section><h3>4. 功能需求列表</h3>${prdTable(['功能模块','功能点','需求描述','优先级（P0 / P1 / P2）','备注说明'],[['应用导航','删除首页','删除首页入口；默认进入我的问卷；旧首页地址重定向我的问卷。','P0','两端一致'],['云首页','顶部统计','仅显示问卷总数与进行中问卷。','P0','未开始不计入进行中'],['PC 云首页','最新五条问卷','最多展示当前组织最新五条已发布问卷，点击进入统计详情。','P0','按创建时间和 ID 倒序'],['移动云首页','最新可见问卷','展示当前填写人员最新一条可见问卷、状态和截止时间；未开始问卷不展示。','P0','与移动填写列表共用可见口径']])}</section><section><h3>5. 核心流程与交互说明</h3><p>PC 展示两项统计与最新组织问卷，点击进入统计详情；移动端展示两项统计与填写人员最新一条可见问卷，点击进入填写或答卷查看。</p></section><section><h3>6. 异常场景与边界条件</h3><p>PC 不足五条时按实际数量展示；移动端无当前可见问卷时展示“暂无问卷”；未开始问卷不占用最新问卷位置。截止日期缺失展示 —，加载失败和无权限不得显示为零。</p></section><section><h3>7. 数据口径与埋点需求</h3><p>PC 列表取当前组织未删除且已发布问卷，按创建时间和 ID 倒序最多五条。移动端复用填写人员可见问卷数据源，仅包含进行中、已暂停和已结束问卷，并按创建时间和 ID 倒序取一条。记录 cloud_widget_open、survey_widget_entry_click、prd_rule_open、prd_rule_close；【假设】公共属性包含 portal、device、survey_id、entry_target 和 timestamp。</p></section><section><h3>8. 风险、依赖与限制</h3><p>当前为前端演示数据；正式统计依赖组织权限、个人答卷状态和聚合接口，缓存必须隔离组织、用户及权限范围。</p></section><section><h3>9. 验收标准</h3><p>两端无首页菜单；PC 最新组织问卷不超过五条并进入统计详情；移动端仅展示填写人员最新一条可见问卷且不包含未开始问卷；空态和截止日期展示正确。</p></section>`}
+function cloudWidgetRules(){return `<section><h3>1. 背景与目标</h3><p>删除教育局端、学校端应用首页模块，在云首页按设备提供精简统计与高频问卷入口。</p></section><section><h3>2. 用户与使用场景</h3><p>教育局与学校授权用户在 PC 云首页查看组织问卷概览，在移动云首页查看本人当前可见的最新问卷。</p></section><section><h3>3. 需求范围</h3><h4>In Scope</h4><p>两端首页入口删除、两项统计、PC 最新三条组织问卷、移动端本人最新三条可见问卷、截止日期及对应跳转。</p><h4>Out of Scope</h4><p>移动端我的问卷列表、问卷创建表单、其他页面时间字段调整及后端接口实现。</p></section><section><h3>4. 功能需求列表</h3>${prdTable(['功能模块','功能点','需求描述','优先级（P0 / P1 / P2）','备注说明'],[['应用导航','删除首页','删除首页入口；默认进入我的问卷；旧首页地址重定向我的问卷。','P0','两端一致'],['云首页','顶部统计','仅显示问卷总数与进行中问卷。','P0','未开始不计入进行中'],['PC 云首页','最新三条问卷','最多展示当前组织最新三条已发布问卷，点击进入统计详情。','P0','按创建时间和 ID 倒序'],['移动云首页','最新可见问卷','展示当前填写人员最新三条可见问卷、状态和截止时间；未开始问卷不展示。','P0','与移动填写列表共用可见口径']])}</section><section><h3>5. 核心流程与交互说明</h3><p>PC 展示两项统计与最新组织问卷，点击进入统计详情；移动端展示两项统计与填写人员最新三条可见问卷，点击进入填写或答卷查看。</p></section><section><h3>6. 异常场景与边界条件</h3><p>PC 与移动端不足三条时按实际数量展示，无符合条件的问卷时展示“暂无问卷”；未开始问卷不占用最新问卷位置。截止日期缺失展示 —，加载失败和无权限不得显示为零。</p></section><section><h3>7. 数据口径与埋点需求</h3><p>PC 列表取当前组织未删除且已发布问卷，按创建时间和 ID 倒序最多三条。移动端复用填写人员可见问卷数据源，仅包含进行中、已暂停和已结束问卷，并按创建时间和 ID 倒序取三条。记录 cloud_widget_open、survey_widget_entry_click、prd_rule_open、prd_rule_close；【假设】公共属性包含 portal、device、survey_id、entry_target 和 timestamp。</p></section><section><h3>8. 风险、依赖与限制</h3><p>当前为前端演示数据；正式统计依赖组织权限、个人答卷状态和聚合接口，缓存必须隔离组织、用户及权限范围。</p></section><section><h3>9. 验收标准</h3><p>两端无首页菜单；PC 最新组织问卷不超过三条并进入统计详情；移动端仅展示填写人员最新三条可见问卷且不包含未开始问卷；空态和截止日期展示正确。</p></section>`}
 function closePrd(method='button'){
  const layer=$('#prd-layer');if(!layer?.classList.contains('show'))return;
  prdTrack('prd_rule_close',layer.dataset.entryType||'page',layer.dataset.ruleKey||'',method);layer.classList.remove('show');layer.innerHTML='';
@@ -423,10 +423,10 @@ function surveySubmissionSplit(s,snapshot=null){const source=snapshot||s||{},has
 function internalSubmittedCount(s,snapshot=null){return surveySubmissionSplit(s,snapshot).internalDone}
 function externalSubmittedCount(s,snapshot=null){return surveySubmissionSplit(s,snapshot).externalDone}
 function submittedCount(s,snapshot=null){return internalSubmittedCount(s,snapshot)+externalSubmittedCount(s,snapshot)}
-function widgetSurveys(){syncAllSurveyTemporalStatuses();return CONFIG[state.portal].surveys.filter(s=>s.deleted!==1&&s.status!=='draft').sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||''))||Number(b.id||0)-Number(a.id||0)).slice(0,5)}
+function widgetSurveys(){syncAllSurveyTemporalStatuses();return CONFIG[state.portal].surveys.filter(s=>s.deleted!==1&&s.status!=='draft').sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||''))||Number(b.id||0)-Number(a.id||0)).slice(0,3)}
 function widgetDeadline(s){if(s.deadline)return s.deadline;if(s.endDate)return s.endDate;if(!s.time||s.time==='未发布')return '—';if(s.time.includes(' 至 '))return s.time.split(' 至 ').pop();if(s.time.startsWith('每日 '))return '每日 '+s.time.slice(3).split('-').pop();return s.time}
 function surveyCreatedAtValue(value){const parts=String(value||'').match(/\d+/g)?.map(Number)||[];if(parts.length<3)return-1;const stamp=Date.UTC(parts[0],parts[1]-1,parts[2],parts[3]||0,parts[4]||0,parts[5]||0);return Number.isFinite(stamp)?stamp:-1}
-function mobileWidgetSurveys(){return mobileReceived().sort((a,b)=>surveyCreatedAtValue(b.createdAt)-surveyCreatedAtValue(a.createdAt)||Number(b.id||0)-Number(a.id||0)).slice(0,1)}
+function mobileWidgetSurveys(){return mobileReceived().sort((a,b)=>surveyCreatedAtValue(b.createdAt)-surveyCreatedAtValue(a.createdAt)||Number(b.id||0)-Number(a.id||0)).slice(0,3)}
 function mobileWidgetSurveyHref(s){return `#mobile/fill/${s.id}/${fillStatusKey(s)==='submitted'?'view':'edit'}`}
 function widgetDateWithYear(value,fallbackYear=''){const match=String(value||'').trim().match(/(?:(\d{4})-)?(\d{1,2})-(\d{1,2})(?!\d)/);if(!match)return'';const month=+match[2],day=+match[3];if(month<1||month>12||day<1||day>31)return'';const year=match[1]||(/^\d{4}$/.test(String(fallbackYear))?String(fallbackYear):beijingDateKey().slice(0,4));return `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`}
 function mobileWidgetDeadline(s){const year=String(s.createdAt||'').match(/^(\d{4})/)?.[1]||beijingDateKey().slice(0,4),legacyEnd=s.time?.includes(' 至 ')?s.time.split(' 至 ').pop():'';return widgetDateWithYear(s.endDate,year)||widgetDateWithYear(s.deadline,year)||widgetDateWithYear(legacyEnd,year)||'—'}
@@ -1428,13 +1428,13 @@ cloudHomeWidget=function(){syncCloudWidgetStats();return state.preview==='mobile
 cloudWidgetRules=function(){return `
 	 <section><h3>1. 背景与目标</h3><p>删除教育局端、学校端应用首页模块，在云首页按设备提供精简统计与高频问卷入口。</p></section>
 	 <section><h3>2. 用户与使用场景</h3><p>教育局与学校授权用户在 PC 云首页查看组织问卷概览，在移动云首页快速进入本人最新收到的问卷。</p></section>
-	 <section><h3>3. 需求范围</h3><h4>In Scope</h4><p>两端首页入口删除、两项统计、PC 最新五条组织问卷、移动端最新一条本人收到的问卷、截止日期、状态标签及对应详情跳转。</p><h4>Out of Scope</h4><p>移动端我的问卷列表排序、问卷创建表单、其他页面时间字段调整及后端接口实现。</p></section>
-	 <section><h3>4. 功能需求列表</h3>${prdTable(['功能模块','功能点','需求描述','优先级（P0 / P1 / P2）','备注说明'],[['应用导航','删除首页','删除首页入口；默认进入我的问卷；旧首页地址重定向我的问卷。','P0','两端一致'],['云首页','顶部统计','仅显示问卷总数与进行中问卷，并缩小统计区高度。','P0','未开始不计入进行中'],['PC 云首页','最新五条问卷','最多展示当前组织最新五条已发布问卷，点击进入统计详情。','P0','按创建时间和 ID 倒序'],['移动云首页','最新一条本人问卷','仅展示当前用户收到的最新一条问卷，已填写与未填写均纳入；已填写进入本人答卷查看，未填写进入填写页。','P0','不按填写状态优先']])}</section>
-	 <section><h3>5. 核心流程与交互说明</h3><p>PC 展示两项统计与最新五条组织问卷；移动端从“我收到的”问卷中按创建时间倒序取第一条，不区分已填写或未填写，点击后进入对应的本人答卷查看或填写页面。PC“查看更多”进入问卷管理。</p></section>
-	 <section><h3>6. 异常场景与边界条件</h3><p>PC 不足五条时按实际数量展示；移动端无本人收到的问卷时展示“暂无问卷”。截止日期缺失展示 —；加载失败和无权限不得显示为零。</p></section>
-	 <section><h3>7. 数据口径与埋点需求</h3><p>PC 列表取当前组织未删除且已发布问卷，按创建时间和 ID 倒序最多五条；移动端列表取当前用户收到且可见的问卷，包含已填写和未填写，按创建时间和 ID 倒序仅取一条。问卷总数包含未删除草稿；进行中仅计同步日期状态后 status=running 的问卷。记录 cloud_widget_open、survey_widget_entry_click、prd_rule_open、prd_rule_close；【假设】公共属性包含 portal、device、survey_id、fill_status、entry_target 和 timestamp。</p></section>
+	 <section><h3>3. 需求范围</h3><h4>In Scope</h4><p>两端首页入口删除、两项统计、PC 最新三条组织问卷、移动端最新三条本人收到的问卷、截止日期、状态标签及对应详情跳转。</p><h4>Out of Scope</h4><p>移动端我的问卷列表排序、问卷创建表单、其他页面时间字段调整及后端接口实现。</p></section>
+	 <section><h3>4. 功能需求列表</h3>${prdTable(['功能模块','功能点','需求描述','优先级（P0 / P1 / P2）','备注说明'],[['应用导航','删除首页','删除首页入口；默认进入我的问卷；旧首页地址重定向我的问卷。','P0','两端一致'],['云首页','顶部统计','仅显示问卷总数与进行中问卷，并缩小统计区高度。','P0','未开始不计入进行中'],['PC 云首页','最新三条问卷','最多展示当前组织最新三条已发布问卷，点击进入统计详情。','P0','按创建时间和 ID 倒序'],['移动云首页','最新三条本人问卷','仅展示当前用户收到的最新三条问卷，已填写与未填写均纳入；已填写进入本人答卷查看，未填写进入填写页。','P0','不按填写状态优先']])}</section>
+	 <section><h3>5. 核心流程与交互说明</h3><p>PC 展示两项统计与最新三条组织问卷；移动端从“我收到的”问卷中按创建时间倒序取前三条，不区分已填写或未填写，点击后进入对应的本人答卷查看或填写页面。PC“查看更多”进入问卷管理。</p></section>
+	 <section><h3>6. 异常场景与边界条件</h3><p>PC 与移动端不足三条时按实际数量展示，无符合条件的问卷时展示“暂无问卷”。截止日期缺失展示 —；加载失败和无权限不得显示为零。</p></section>
+	 <section><h3>7. 数据口径与埋点需求</h3><p>PC 列表取当前组织未删除且已发布问卷，按创建时间和 ID 倒序最多三条；移动端列表取当前用户收到且可见的问卷，包含已填写和未填写，按创建时间和 ID 倒序仅取三条。问卷总数包含未删除草稿；进行中仅计同步日期状态后 status=running 的问卷。记录 cloud_widget_open、survey_widget_entry_click、prd_rule_open、prd_rule_close；【假设】公共属性包含 portal、device、survey_id、fill_status、entry_target 和 timestamp。</p></section>
 	 <section><h3>8. 风险、依赖与限制</h3><p>当前为前端演示数据；正式统计依赖组织权限、个人答卷状态和聚合接口，缓存必须隔离组织、用户及权限范围。生产数据使用独立 deadline 字段，原型兼容已有时间文本。</p></section>
-	 <section><h3>9. 验收标准</h3><p>两端无首页菜单，旧地址进入我的问卷；PC 与移动端均仅显示问卷总数和进行中问卷；PC 最新组织问卷不超过五条；移动端仅显示本人收到的最新一条问卷，已填写与未填写均可成为最新项并进入对应页面；空态和截止日期展示正确。</p></section>
+	 <section><h3>9. 验收标准</h3><p>两端无首页菜单，旧地址进入我的问卷；PC 与移动端均仅显示问卷总数和进行中问卷；PC 最新组织问卷不超过三条；移动端仅显示本人收到的最新三条问卷，已填写与未填写均可成为最新项并进入对应页面；空态和截止日期展示正确。</p></section>
 `}
 
 /* PRD V1.10: keep every page-level document aligned with the current prototype. */
@@ -2183,9 +2183,9 @@ resource:{
    ['填写列表','可见状态','按未填写和已填写查看本人问卷；未开始问卷不进入填写人员列表，开始日自动转为进行中后才可见。','P0','仅当前用户接收范围'],
    ['问卷访问','状态校验','点击时重新校验未删除、接收资格、问卷状态和提交频次。','P0','直链同样校验'],
    ['页面跳转','填写与查看','未提交进入填写；已有有效答卷仅进入只读查看，不提供修改或再次保存。','P0','保留返回路径'],
-    ['云首页','最新问卷','仅从当前填写人员可见问卷中展示最新一条，未开始问卷不展示。','P1','与移动填写列表共用可见口径']
+    ['云首页','最新问卷','仅从当前填写人员可见问卷中展示最新三条，未开始问卷不展示。','P1','与移动填写列表共用可见口径']
   ],
-   flow:'进入移动填写列表并选择状态；点击问卷后校验访问资格，未提交时进入填写，已有答卷时进入只读查看；返回时回到原筛选。移动云首页仅展示当前填写人员可见的最新一条问卷。',
+   flow:'进入移动填写列表并选择状态；点击问卷后校验访问资格，未提交时进入填写，已有答卷时进入只读查看；返回时回到原筛选。移动云首页仅展示当前填写人员可见的最新三条问卷。',
   exceptions:'未开始问卷不进入列表，直接访问旧链接时展示通用不可访问空态；暂停、结束、删除、移出接收范围或已达提交上限时禁止新增提交；无结果展示空态。',
   data:'列表仅包含当前填写人员有接收资格、deleted!=1 且状态为 running、paused 或 ended 的问卷；移动云首页复用同一数据源。记录 mobile_fill_filter、mobile_survey_open、mobile_access_denied；【假设】公共属性包含 user_id、survey_id、fill_status、survey_status、timestamp。',
   risks:'接收范围为动态组织时须在每次进入和提交前实时解析；移动缓存不得绕过状态及权限变化。',
