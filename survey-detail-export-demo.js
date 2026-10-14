@@ -28,7 +28,7 @@ function surveyDetailExportDemoValue(q, s, portal, sampleIndex, date) {
   if (kind === 'multiple') return options.length ? [options[sampleIndex % options.length], options[(sampleIndex + 1) % options.length]].filter((value, index, values) => values.indexOf(value) === index) : ['演示选项'];
   if (kind === 'date') return q.includeTime ? `${date} 09:${String(sampleIndex * 7).padStart(2, '0')}` : date;
   if (kind === 'file') return sampleIndex % 2 === 0 ? 'assets/survey-export-demo-campus.svg' : `演示附件${sampleIndex + 1}.pdf`;
-  if (kind === 'signature') return `演示签名${sampleIndex + 1}（不导出）`;
+  if (kind === 'signature') return 'assets/survey-export-demo-signature.svg';
   if (kind === 'location') return ['浙江省-杭州市-西湖区', '江苏省-南京市-鼓楼区', '广东省-广州市-天河区'][sampleIndex % 3];
   if (/姓名/.test(q.title)) return ['张晨', '李宁', '王悦', '陈静', '赵敏'][sampleIndex % 5] + '（演示）';
   if (/手机|电话/.test(q.title)) return `演示联系电话${sampleIndex + 1}`;

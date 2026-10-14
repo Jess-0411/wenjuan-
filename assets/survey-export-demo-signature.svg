@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title description">
+  <title id="title">演示签名</title>
+  <desc id="description">仅用于问卷导出功能演示的示意笔迹，不属于真实用户签名。</desc>
+  <rect width="900" height="420" rx="18" fill="#f4f7fb"/>
+  <rect x="40" y="40" width="820" height="275" rx="12" fill="#fff" stroke="#d8e1ec" stroke-width="2"/>
+  <text x="70" y="85" font-family="sans-serif" font-size="22" fill="#52647a">演示签名 · 示意笔迹</text>
+  <g fill="none" stroke="#26394f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M175 221 C200 188 223 158 214 151 C206 145 188 175 194 198 C201 220 234 216 252 199 L236 238 C249 226 268 198 277 179 C287 159 296 143 289 142 C278 141 274 177 284 196 C294 215 320 211 342 192"/>
+    <path d="M340 221 C365 187 386 162 378 154 C369 149 353 174 359 195 C366 219 396 214 419 195 L411 231 C422 218 438 201 452 183 C465 165 478 153 483 160 C491 170 467 200 476 212 C487 223 514 208 536 194"/>
+    <path d="M539 218 C560 192 581 172 588 180 C595 188 579 207 587 216 C598 229 625 202 639 190 C652 179 661 177 667 184 C674 193 657 211 667 218 C678 226 702 214 725 202"/>
+    <path d="M182 260 C344 238 535 247 729 238" stroke-width="3"/>
+  </g>
+  <text x="450" y="363" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#52647a">仅供问卷导出演示使用 · 非真实用户签名</text>
+</svg>

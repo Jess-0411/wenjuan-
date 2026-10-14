@@ -82,7 +82,7 @@ function surveyDetailExportImageLinks(q, value) {
     let pathname = url.pathname;
     try { pathname = decodeURIComponent(pathname); } catch { return; }
     const fileName = String(attachment?.name || attachment?.fileName || '');
-    const fileExtension = /\.(pdf|docx?|xlsx?|pptx?|txt|csv|zip|rar|7z|mp[34]|wav)$/i;
+    const fileExtension = /\.(pdf|ofd|doc[xm]?|dot[xm]?|xls[xmb]?|xlt[xm]?|ppt[xm]?|pot[xm]?|pps[xm]?|od[tsfp]|ot[tsp]|rtf|txt|csv|epub|mobi|zip|rar|7z|tar|[tb]?gz|bz2|mp[34]|wav|aac|flac|ogg|m4[av]|mov|avi|wmv|mkv|webm)$/i;
     if (fileExtension.test(pathname) || fileExtension.test(fileName)) return;
     const mime = attachment?.mimeType || attachment?.contentType || (String(attachment?.type || '').includes('/') ? attachment.type : '');
     const mediaType = attachment?.mediaType || attachment?.type;
@@ -128,10 +128,14 @@ function surveyDetailExportValues(questions, record) {
     && record.questionSnapshot.some((q, index) => String(q.id) !== String(questions[index].id))) throw surveyDetailExportError('schema');
   return questions.map((q, index) => {
     const kind = surveyDetailExportKind(q);
-    if (kind === 'signature') return '';
     const entry = byId?.get(String(q.id));
     const value = entry ? entry.value : record.answers[index][1];
-    if (kind === 'file') return ['logic_skipped', 'unanswered'].includes(entry?.status) ? '' : surveyDetailExportImageLinks(q, value).join('\n');
+    if (['file', 'signature'].includes(kind)) {
+      if (['logic_skipped', 'unanswered'].includes(entry?.status)) return '';
+      // A signature is an image even when its saved access URL has no extension.
+      // In-memory tokens and non-image attachments still have no exportable URL.
+      return surveyDetailExportImageLinks(kind === 'signature' ? {...q, imageOnly: true} : q, value).join('\n');
+    }
     if (entry?.status === 'logic_skipped') return '逻辑跳过';
     const values = Array.isArray(value) ? value : [value];
     if (values.some(item => item != null && !['string', 'number', 'boolean'].includes(typeof item))) throw surveyDetailExportError('schema');
@@ -153,12 +157,13 @@ function buildSurveyDetailExportWorkbook(s) {
   sheet['!cols'] = [{wch: 8}, ...questions.map(() => ({wch: 32}))];
   sheet['!rows'] = [{hpt: 28}, {hpt: 42}];
   questions.forEach((q, questionIndex) => {
-    if (surveyDetailExportKind(q) !== 'file') return;
+    const kind = surveyDetailExportKind(q);
+    if (!['file', 'signature'].includes(kind)) return;
     rows.slice(2).forEach((row, recordIndex) => {
       const value = row[questionIndex + 1];
       if (value && !value.includes('\n')) {
         const address = library.utils.encode_cell({r: recordIndex + 2, c: questionIndex + 1});
-        sheet[address].l = {Target: value, Tooltip: '查看图片'};
+        sheet[address].l = {Target: value, Tooltip: kind === 'signature' ? '查看签名' : '查看图片'};
       }
     });
   });
