@@ -72,19 +72,3 @@ function initializeSurveyDetailExportDemoData() {
   }));
 }
 initializeSurveyDetailExportDemoData();
-
-function surveyDetailExportDemoNotice() {
-  return '<div class="filter-card subtle" data-survey-export-demo-notice role="note"><b>演示数据说明：</b>本地原型包含样例答卷。含样例的 Excel 增加“数据说明”工作表，按主表序号标注演示记录；样例不代表业务真实用户提交。</div>';
-}
-
-const surveyDetailExportDemoBaseListPage = listPage;
-listPage = function() {
-  const html = surveyDetailExportDemoBaseListPage();
-  return state.preview === 'pc' && state.listView === 'published'
-    ? html.replace('<div class="tabs">', `${surveyDetailExportDemoNotice()}<div class="tabs">`) : html;
-};
-const surveyDetailExportDemoBaseAllSurveysPage = allSurveysPage;
-allSurveysPage = function() {
-  const html = surveyDetailExportDemoBaseAllSurveysPage();
-  return state.preview === 'pc' ? html.replace('<div class="filter-card all-survey-filter">', `${surveyDetailExportDemoNotice()}<div class="filter-card all-survey-filter">`) : html;
-};
