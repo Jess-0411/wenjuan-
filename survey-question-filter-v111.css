@@ -1,0 +1,20 @@
+.qf-v111 .pc-section-head { gap: 16px; }
+.qf-filter-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 18px 0 14px; color: #465568; font-size: 14px; }
+.qf-dimensions { display: flex; padding: 3px; gap: 3px; border-radius: 8px; background: #f1f5f9; }
+.qf-dimensions button { appearance: none; padding: 7px 18px; border: 0; border-radius: 6px; background: transparent; color: #526176; cursor: pointer; font: inherit; }
+.qf-dimensions button.active { background: #fff; color: #157b62; box-shadow: 0 1px 4px #24395016; font-weight: 600; }
+.qf-dimensions button:focus-visible, .qf-choices input:focus-visible { outline: 2px solid #16866b; outline-offset: 2px; }
+.qf-record-count { margin-left: auto; color: #7a8798; font-size: 13px; white-space: nowrap; }
+.qf-choices { display: flex; flex-wrap: wrap; gap: 9px 18px; padding: 15px 18px; margin-bottom: 12px; border: 1px solid #e4eaf0; border-radius: 8px; background: #fafcfd; }
+.qf-choices label { display: inline-flex; align-items: center; gap: 7px; color: #435167; font-size: 13px; cursor: pointer; }
+.qf-choices input { accent-color: #16866b; width: 15px; height: 15px; }
+.qf-scope-note { color: #8190a2; font-size: 12px; margin: 0 0 18px; line-height: 1.6; }
+.qf-demo-toggle { white-space: nowrap; font-size: 12px; }
+.qf-demo-notice { display: flex; gap: 10px; align-items: center; margin-top: 14px; padding: 10px 14px; background: #fff8e8; border: 1px solid #f0dfb6; border-radius: 7px; color: #8a6832; font-size: 12px; }
+.qf-demo-notice b { white-space: nowrap; }
+.qf-v111 .asset-stat-card b { overflow-wrap: anywhere; }
+.qf-select-all { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #435167; font-size: 13px; cursor: pointer; }
+.qf-select-all input, .qf-file-check input { width: 16px; height: 16px; accent-color: #16866b; cursor: pointer; }
+.qf-v111 .asset-stat-card { position: relative; }
+.qf-file-check { position: absolute; left: 9px; top: 9px; z-index: 2; padding: 3px; border-radius: 4px; background: #ffffffed; display: flex; }
+@media (max-width: 1050px) { .qf-filter-bar { gap: 9px; } .qf-dimensions button { padding: 7px 12px; } .qf-choices { padding: 12px; } }

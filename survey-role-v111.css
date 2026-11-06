@@ -1,0 +1,36 @@
+/* PC role selection only. Mobile has no new configuration entry. */
+.survey-role-modal-v111 { width: min(920px, calc(100vw - 48px)); max-height: calc(100vh - 72px); }
+.survey-role-modal-v111 .recipient-picker-body { overflow: auto; }
+.survey-role-search-v111 { padding: 0 0 16px; }
+.survey-role-search-v111 .recipient-search-box { max-width: 420px; }
+.survey-role-layout-v111 { display: grid; grid-template-columns: 290px minmax(0, 1fr); min-height: 330px; max-height: 420px; border: 1px solid #e6eaf0; border-radius: 8px; overflow: hidden; }
+.survey-role-list-v111 { overflow: auto; background: #f8fafc; border-right: 1px solid #e6eaf0; }
+.survey-role-group-v111 h4 { margin: 0; padding: 12px 16px 8px; color: #758197; font-size: 12px; font-weight: 500; }
+.survey-role-row-v111 { display: flex; align-items: center; gap: 8px; min-height: 56px; padding: 8px 12px 8px 16px; border-bottom: 1px solid #eef1f5; }
+.survey-role-row-v111.active { background: #edf5ff; }
+.survey-role-row-v111 label { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer; }
+.survey-role-row-v111 input { margin: 0; accent-color: #2778e8; }
+.survey-role-row-v111 label > span { display: grid; gap: 3px; color: #25354b; font-size: 13px; overflow-wrap: anywhere; }
+.survey-role-row-v111 small { font-size: 11px; color: #8894a6; }
+.survey-role-row-v111 > button { padding: 5px 0; white-space: nowrap; border: 0; background: none; color: #2b78dc; font-size: 11px; cursor: pointer; }
+.survey-role-preview-v111 { display: flex; flex-direction: column; min-width: 0; background: white; }
+.survey-role-preview-v111 > header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid #e9edf3; }
+.survey-role-preview-v111 h4 { margin: 0 0 4px; color: #24344b; font-size: 14px; }
+.survey-role-preview-v111 header span { color: #8b96a7; font-size: 12px; }
+.survey-role-preview-v111 header .btn { padding: 6px 10px; font-size: 12px; }
+.survey-role-preview-v111 header .btn:disabled { cursor: not-allowed; opacity: .5; }
+.survey-role-members-v111 { overflow: auto; flex: 1; }
+.survey-role-member-v111 { display: flex; align-items: center; gap: 10px; padding: 13px 18px; border-bottom: 1px solid #f0f3f7; }
+.survey-role-avatar-v111 { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #eaf2ff; color: #3d78bd; font-size: 12px; }
+.survey-role-member-v111 > div { display: grid; gap: 4px; min-width: 0; }
+.survey-role-member-v111 b { font-size: 13px; font-weight: 500; }
+.survey-role-member-v111 small { color: #8b96a7; font-size: 11px; overflow-wrap: anywhere; }
+.survey-role-selected-v111 { display: flex; align-items: flex-start; gap: 12px; padding: 16px 0 0; min-height: 42px; }
+.survey-role-selected-v111 > b { flex-shrink: 0; padding-top: 5px; color: #68778b; font-size: 12px; font-weight: 400; }
+.survey-role-selected-v111 > div { display: flex; flex-wrap: wrap; gap: 7px; }
+.survey-role-selected-v111 > div > span:not(.subtle) { display: inline-flex; gap: 8px; align-items: center; padding: 5px 8px; color: #337bc9; background: #edf5ff; border-radius: 4px; font-size: 12px; }
+.survey-role-selected-v111 > div > span.invalid { color: #c75646; background: #fff0ed; }
+.survey-role-selected-v111 button { padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+.survey-role-module-v111 { margin-top: 0; }
+.device-mobile .survey-role-module-v111 { display: none; }
+@media (max-width: 860px) { .survey-role-layout-v111 { grid-template-columns: 240px minmax(0, 1fr); } .survey-role-row-v111 > button { font-size: 10px; } }

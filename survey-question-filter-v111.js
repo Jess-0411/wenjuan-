@@ -1,0 +1,323 @@
+/* PC question-only analytics. Submission snapshots are shared by every fill channel. */
+(function () {
+  'use strict';
+  const RELEASE = '1.11', UNCLASSIFIED = '__unclassified__';
+  const filters = new Map(), taskContexts = new Map();
+  let lockedSave = null, installed = false, baseRender, baseMetadata, baseSaveContext, baseAttachmentFiles;
+  const clone = value => JSON.parse(JSON.stringify(value));
+  const unique = values => [...new Set((values || []).filter(Boolean).map(String))];
+  const key = survey => `${state.portal}:${survey.id}`;
+  const directory = () => window.RECIPIENT_SELECTOR_V18_API?.guardianDirectory || {orgNodes: [], students: [], studentGuardianRelations: []};
+  const label = (id, fallback = '') => directory().orgNodes.find(node => node.nodeId === id)?.nodeName || fallback;
+  const now = () => typeof formatSystemTime === 'function' ? formatSystemTime() : new Date().toISOString();
+  function track(event, survey, properties = {}) {
+    const row = {event, portal: state.portal, device: state.preview, survey_id: survey?.id, timestamp: now(), ...properties};
+    (window.__surveyQuestionFilterEvents ||= []).push(row);
+  }
+  function trackChange(survey, filter) {
+    const view = buildView(survey, filter);
+    track('survey_question_filter_change', survey, {dimension: filter.dimension, selected_count: filter.selectedIds.length,
+      result_count: view.selected.length, stats_date: view.date, data_source: filter.demo ? 'demo' : 'responses'});
+  }
+  function departments(portal = state.portal) {
+    const rows = window.SurveyRoleV111?.getDepartments?.(portal) || (typeof DEPARTMENT_PEOPLE !== 'undefined' ? DEPARTMENT_PEOPLE[portal] : []) || [];
+    return rows.map(row => ({id: String(row.id || row.departmentId || ''), name: row.name || row.departmentName || ''})).filter(row => row.id);
+  }
+  function contextFor(survey) {
+    if (!filters.has(key(survey))) filters.set(key(survey), {dimension: 'all', selectedIds: [], demo: false, filePages: {}});
+    return filters.get(key(survey));
+  }
+  function taskSnapshot(survey, answers = [], explicitTask = null) {
+    const portal = state.portal, personId = typeof currentRecipientPersonId === 'function' ? currentRecipientPersonId() : '';
+    const task = explicitTask || answers.taskContext || taskContexts.get(key(survey)) || state.responseTaskBySurvey?.[survey.id] || survey.currentTaskContext || {};
+    const external = task.identityType === 'external' || (typeof isExternalFillContext === 'function' && isExternalFillContext(survey)) || /\/external(?:$|[/?#])/.test(String(state.page || ''));
+    const snapshot = {schemaVersion: 1, capturedAt: now(), portal, departmentOrgType: portal, identityType: 'unknown', personId: external ? '' : personId,
+      departmentIds: [], departmentNames: [], gradeId: '', gradeName: '', studentId: '', relationId: '', schoolId: ''};
+    if (external) return {...snapshot, identityType: 'external'};
+    const source = directory(), relationId = task.relationId || (source.studentGuardianRelations.some(row => row.relationId === personId) ? personId : '');
+    const relation = source.studentGuardianRelations.find(row => row.relationId === relationId && row.status === 'active' && row.canReceive === true);
+    const studentId = relation?.studentId || task.studentId || (task.identityType === 'student' || source.students.some(row => row.studentId === personId) ? personId : '');
+    const student = source.students.find(row => row.studentId === studentId && row.status === 'active');
+    if (relation && student) return {...snapshot, identityType: 'guardian', relationId: relation.relationId,
+      studentId: student.studentId, guardianId: relation.guardianId, schoolId: student.schoolId,
+      gradeId: student.gradeId || '', gradeName: label(student.gradeId), classId: student.classId || ''};
+    if (student && (task.identityType === 'student' || !task.identityType && student.studentId === personId)) return {...snapshot, identityType: 'student', studentId: student.studentId,
+      schoolId: student.schoolId, gradeId: student.gradeId || '', gradeName: label(student.gradeId), classId: student.classId || ''};
+    // A guardian task with a missing/ambiguous relation must never fall back to the account's staff identity.
+    if (['guardian', 'guardian_relation', 'parent'].includes(task.identityType) || task.relationId) return {...snapshot, identityType: 'guardian', relationId: task.relationId || '', studentId};
+    if (task.identityType === 'student') return {...snapshot, identityType: 'student', studentId};
+    const person = window.SurveyRoleV111?.getPersonContext?.({portal, personId, survey, taskContext: task});
+    if (person?.identityType === 'staff') return {...snapshot, identityType: 'staff', personId: person.personId || personId,
+      departmentIds: unique(person.departmentIds), departmentNames: (person.departmentNames || []).map(String)};
+    const affiliations = typeof recipientPersonAffiliations === 'function' ? recipientPersonAffiliations(personId) : [];
+    if (affiliations.length) return {...snapshot, identityType: 'staff', departmentIds: unique(affiliations.map(row => row.departmentId)),
+      departmentNames: unique(affiliations.map(row => row.departmentName))};
+    return snapshot;
+  }
+  function questions(survey) {
+    const source = Array.isArray(survey.publishedQuestions) ? survey.publishedQuestions : surveyQuestions(survey);
+    return SurveyRouting.normalizeQuestions(source.map((question, index) => ({...question, id: question.id || `filter-${survey.id}-q-${index + 1}`})));
+  }
+  function actualRecords(survey) {
+    const containers = [MY_RESPONSES[state.portal]?.[survey.id], survey.internalResponseRecords, survey.respondentRecords];
+    const seen = new Set(), result = [];
+    containers.forEach(rows => (Array.isArray(rows) ? rows : []).forEach((record, index) => {
+      if (!record || record.surveyId != null && String(record.surveyId) !== String(survey.id)) return;
+      const id = record.id ?? record.responseId, identity = id != null ? `id:${id}` : record;
+      if (seen.has(identity)) return;
+      seen.add(identity); // Primary invalid records suppress stale embedded copies.
+      if (record.valid === false) return;
+      result.push(record);
+    }));
+    return result;
+  }
+  function readable(value) {
+    if (Array.isArray(value)) return value.map(readable).join('、');
+    if (value && typeof value === 'object') return String(value.name || value.fileName || value.address || value.url || '');
+    return String(value ?? '');
+  }
+  function aggregateRecord(qs, record) {
+    if (Array.isArray(record.answerEntries)) return record;
+    const entries = qs.flatMap((question, index) => {
+      const tuple = record.answers?.find(answer => answer?.[2]?.questionId === question.id)
+        || (record.answers?.[index]?.[0] === question.title ? record.answers[index] : null);
+      if (!tuple) return [];
+      const metadata = tuple[2] || {}, value = questionKind(question.type) === 'multiple' && typeof tuple[1] === 'string'
+        ? tuple[1].split('、').filter(Boolean) : tuple[1];
+      return [{...metadata, questionId: question.id, value, status: metadata.status || (SurveyRouting.empty(value) ? 'unanswered' : 'answered')}];
+    });
+    return {...record, answerEntries: entries};
+  }
+  function snapshotOf(record) { return record.respondentSnapshot || null; }
+  function applicable(record, dimension) {
+    const snapshot = snapshotOf(record), type = snapshot?.identityType;
+    if (record.external === true || type === 'external') return false;
+    if (!snapshot || !type || type === 'unknown') return true;
+    if (dimension === 'grade') return ['student', 'guardian', 'guardian_relation', 'parent'].includes(type);
+    return type === 'staff' && (!snapshot.portal || snapshot.portal === state.portal)
+      && !(state.portal === 'bureau' && snapshot.schoolId && snapshot.departmentOrgType !== 'bureau');
+  }
+  function membershipIds(record, dimension) {
+    const snapshot = snapshotOf(record);
+    if (dimension === 'grade') return snapshot?.gradeId ? [String(snapshot.gradeId)] : [];
+    return unique(snapshot?.departmentIds || snapshot?.departments?.map(row => row.id || row.departmentId));
+  }
+  function matches(record, filter) {
+    if (filter.dimension === 'all') return true;
+    if (!applicable(record, filter.dimension)) return false;
+    if (!filter.selectedIds.length) return true;
+    const ids = membershipIds(record, filter.dimension);
+    return ids.length ? ids.some(id => filter.selectedIds.includes(id)) : filter.selectedIds.includes(UNCLASSIFIED);
+  }
+  function optionsFor(records, dimension) {
+    const rows = new Map();
+    if (dimension === 'department') departments().forEach(row => rows.set(row.id, row));
+    if (dimension === 'grade') directory().orgNodes.filter(node => node.nodeType === 'grade').forEach(node => rows.set(node.nodeId, {id: node.nodeId, name: node.nodeName}));
+    records.filter(record => applicable(record, dimension)).forEach(record => {
+      const snapshot = snapshotOf(record);
+      membershipIds(record, dimension).forEach((id, index) => {
+        if (!rows.has(id)) rows.set(id, {id, name: dimension === 'grade' ? snapshot.gradeName || id : snapshot.departmentNames?.[index] || snapshot.departments?.[index]?.name || id});
+      });
+    });
+    return [...rows.values(), {id: UNCLASSIFIED, name: '未归类'}];
+  }
+  function demoRecords(survey, qs, date) {
+    const depts = departments(), fallback = state.portal === 'bureau' ? ['bureau-office', '办公室'] : ['school-admin', '行政办公室'];
+    const first = depts[0] || {id: fallback[0], name: fallback[1]}, second = depts[1] || first;
+    const grades = directory().orgNodes.filter(node => node.nodeType === 'grade');
+    const firstGrade = grades.find(node => node.nodeId === 'grade-junior-7') || grades[0] || {nodeId: 'demo-grade-7', nodeName: '七年级'};
+    const secondGrade = grades.find(node => node.nodeId === 'grade-junior-8') || grades[1] || {nodeId: 'demo-grade-8', nodeName: '八年级'};
+    const snapshots = [
+      {identityType: 'staff', departmentIds: [first.id], departmentNames: [first.name]},
+      {identityType: 'staff', departmentIds: [second.id], departmentNames: [second.name]},
+      {identityType: 'staff', departmentIds: unique([first.id, second.id]), departmentNames: unique([first.name, second.name])},
+      {identityType: 'student', studentId: 'filter-demo-student-7', gradeId: firstGrade.nodeId, gradeName: firstGrade.nodeName},
+      {identityType: 'guardian', relationId: 'filter-demo-relation-8', studentId: 'filter-demo-student-8', gradeId: secondGrade.nodeId, gradeName: secondGrade.nodeName},
+      null,
+      {identityType: 'external'},
+    ];
+    return snapshots.map((identity, index) => {
+      const answers = qs.map((question, questionIndex) => {
+        const kind = questionKind(question.type);
+        const value = kind === 'single' ? question.options[index % Math.max(1, question.options.length)] || '演示选项'
+          : kind === 'multiple' ? question.options.slice(0, index % Math.max(1, question.options.length) + 1)
+          : kind === 'date' ? `${date || beijingDateKey()}${question.includeTime ? ' 09:00' : ''}`
+          : kind === 'file' ? Array.from({length: index === 0 ? 12 : 1}, (_, n) => `筛选演示_${index + 1}_${n + 1}.jpg`)
+          : kind === 'signature' ? '筛选演示签名' : kind === 'location' ? '浙江省-杭州市-西湖区' : `筛选演示回答 ${index + 1}－${questionIndex + 1}`;
+        return [question.title, value];
+      });
+      const computed = SurveyRouting.computePath(qs, answers);
+      return {id: `question-filter-demo-${state.portal}-${survey.id}-${index + 1}`, surveyId: survey.id, valid: true,
+        external: identity?.identityType === 'external', dataOrigin: 'question_filter_demo', submitter: `筛选演示人员 ${index + 1}`,
+        submittedAt: `${date || beijingDateKey()} 09:${String(index).padStart(2, '0')}:00`, answers,
+        answerEntries: computed.errors.length ? aggregateRecord(qs, {answers}).answerEntries : computed.entries,
+        respondentSnapshot: identity ? {schemaVersion: 1, capturedAt: now(), portal: state.portal, departmentIds: [], departmentNames: [], gradeId: '', ...identity} : null};
+    });
+  }
+  function attachments(value) {
+    if (Array.isArray(value)) return value.flatMap(attachments);
+    if (value && typeof value === 'object') return [{name: value.name || value.fileName || value.url || '附件', url: value.url || '', format: value.mimeType || ''}];
+    return String(value || '').split('、').filter(Boolean).map(name => ({name}));
+  }
+  function buildView(survey, filter = contextFor(survey)) {
+    const qs = questions(survey), date = isDailySurvey(survey) ? selectedStatsDate(survey) : '';
+    const records = (isDailySurvey(survey) && !date ? [] : filter.demo ? demoRecords(survey, qs, date) : actualRecords(survey))
+      .filter(record => !date || String(record.submittedAt || '').slice(0, 10) === date);
+    const selected = records.filter(record => matches(record, filter)), prepared = selected.map(record => aggregateRecord(qs, record));
+    const summaries = SurveyRouting.aggregate(qs, prepared);
+    const result = qs.map((question, index) => {
+      const summary = summaries[index], kind = questionKind(question.type), values = summary.values.map(item => readable(item.value));
+      const base = {id: question.id, title: question.title, type: questionTypeLabel(question.type), kind, count: summary.count,
+        applicableCount: summary.applicableCount, skippedCount: summary.skippedCount, unansweredCount: summary.unansweredCount, __questionFilterV111: true};
+      if (kind === 'single' || kind === 'multiple') return {...base, options: summary.options.map(option => [option.text, option.count])};
+      if (kind === 'text') return {...base, answers: values};
+      if (kind === 'date') return {...base, dates: unique(values).map(value => [value, values.filter(item => item === value).length])};
+      if (kind === 'file') return {...base, files: summary.values.flatMap((item, valueIndex) => attachments(item.value).map((file, fileIndex) => ({...file,
+        id: `${item.record.id || `response-${valueIndex}`}:${question.id}:${fileIndex}`, format: String(file.name.split('.').pop() || 'FILE').toUpperCase(),
+        preview: /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(file.name) ? 'image' : 'file', size: '—', submitter: item.record.submitter || '填写人', time: item.record.submittedAt || '—'})))};
+      if (kind === 'signature') return {...base, signatures: summary.values.map(item => ({name: readable(item.value), submitter: item.record.submitter || '填写人', time: item.record.submittedAt || '—'}))};
+      if (kind === 'location') return {...base, locations: unique(values).map(value => ({name: value, count: values.filter(item => item === value).length, address: value, coordinate: ['—', '—']}))};
+      return base;
+    });
+    return {survey, filter, date, records, selected, questions: result, options: filter.dimension === 'all' ? [] : optionsFor(records, filter.dimension)};
+  }
+  function fileBody(question, survey, index, filter) {
+    const files = question.files || [], pageCount = Math.max(1, Math.ceil(files.length / 8)), page = Math.min(filter.filePages[index] || 1, pageCount);
+    const visible = files.slice((page - 1) * 8, page * 8);
+    if (!files.length) return '<div class="text-answer-empty">当前筛选条件下暂无上传的文件或图片</div>';
+    const canSelect = state.portal === 'school' && resourceCenterAvailable(), selected = selectedFileRows(survey.id, index, files), selectedIds = new Set(selected.map(file => file.id));
+    return `${canSelect ? `<div class="asset-save-toolbar"><div><b>当前筛选共 ${files.length} 份附件，已选 ${selected.length} 份</b><span>全选包含分页外记录；另存为保存已选附件</span></div><button type="button" class="btn green" data-save-assets data-survey-id="${survey.id}" data-question-index="${index}" ${selected.length ? '' : 'disabled'}>另存为</button></div><label class="qf-select-all"><input type="checkbox" data-qf-select-files="${index}" ${selected.length === files.length ? 'checked' : ''}>全选当前筛选结果（${files.length} 份附件）</label>` : ''}
+      <div class="stat-caption">共 ${files.length} 份附件</div><div class="asset-stat-grid">${visible.map(file => {
+        const preview = file.preview === 'image', attrs = preview ? statPreviewAttrs('image', file.name, file.submitter, file.time) : '';
+        return `<article class="asset-stat-card">${canSelect ? `<label class="qf-file-check"><input type="checkbox" data-qf-file-id="${esc(file.id)}" data-qf-question="${index}" aria-label="选择${esc(file.name)}" ${selectedIds.has(file.id) ? 'checked' : ''}></label>` : ''}${preview ? `<button type="button" class="asset-preview image" ${attrs}><span>图片预览</span></button>` : `<div class="asset-preview file"><span>${esc(file.format)}</span></div>`}<div><b>${esc(file.name)}</b><span>${esc(file.format)} · ${esc(file.size)}</span><small>${esc(file.submitter)} · ${esc(file.time)}</small><button class="link-btn" ${preview ? attrs : 'data-preview-stat-asset="文件"'}>查看</button></div></article>`;
+      }).join('')}</div>${pageCount > 1 ? `<div class="text-answer-pagination"><button class="btn sm" data-qf-file-page="${page - 1}" data-qf-question="${index}" ${page === 1 ? 'disabled' : ''}>上一页</button><span>第 ${page} / ${pageCount} 页</span><button class="btn sm" data-qf-file-page="${page + 1}" data-qf-question="${index}" ${page === pageCount ? 'disabled' : ''}>下一页</button></div>` : ''}`;
+  }
+  function selectedFileRows(surveyId, questionIndex, files) {
+    const selection = attachmentSelection(surveyId, questionIndex, files.length);
+    return files.filter(file => selection.all ? !selection.excluded.has(file.id) : selection.ids.has(file.id));
+  }
+  function sectionMarkup(view) {
+    const {survey, filter, questions: qs} = view, index = Math.min(state.pcStatsQuestion, Math.max(0, qs.length - 1)), question = qs[index];
+    const dimensions = state.portal === 'school' ? [['all', '全部'], ['department', '部门'], ['grade', '年级']] : [['all', '全部'], ['department', '机关部门']];
+    const choices = filter.dimension === 'all' ? '' : `<div class="qf-choices" role="group" aria-label="${filter.dimension === 'grade' ? '年级' : '部门'}多选"><label><input type="checkbox" data-qf-all ${filter.selectedIds.length ? '' : 'checked'}>全部${filter.dimension === 'grade' ? '年级' : '部门'}</label>${view.options.map(row => `<label><input type="checkbox" data-qf-id="${esc(row.id)}" ${filter.selectedIds.includes(row.id) ? 'checked' : ''}>${esc(row.name)}</label>`).join('')}</div>`;
+    return `<section class="pc-question-section qf-v111" data-v111-question-filter data-survey-id="${survey.id}"><div class="pc-section-head"><div><h2>题目数据</h2></div><button class="link-btn qf-demo-toggle" type="button" data-qf-demo>${filter.demo ? '返回答卷数据' : '查看筛选演示'}</button></div>
+      ${filter.demo ? '<div class="qf-demo-notice" role="note"><b>筛选演示</b><span>当前为独立样例答卷，不计入问卷统计、人员明细与导出。</span></div>' : ''}
+      <div class="qf-filter-bar"><span>查看维度</span><div class="qf-dimensions" role="group" aria-label="题目数据查看维度">${dimensions.map(row => `<button type="button" data-qf-dimension="${row[0]}" aria-pressed="${filter.dimension === row[0]}" class="${filter.dimension === row[0] ? 'active' : ''}">${row[1]}</button>`).join('')}</div><span class="qf-record-count">${view.selected.length} 份有效答卷</span></div>${choices}
+      ${filter.dimension === 'grade' ? '<p class="qf-scope-note">年级仅统计学生及对应学生家长的答卷；教职工答卷不计入年级。</p>' : filter.dimension === 'department' ? `<p class="qf-scope-note">${state.portal === 'bureau' ? '仅统计教育局机关人员的部门归属。' : '按教职工提交时的部门归属统计。'}未归类仅含缺少归属的内部答卷。</p>` : ''}
+      ${question ? `<div class="pc-question-layout"><nav class="pc-question-nav">${qs.map((item, i) => `<button class="${index === i ? 'active' : ''}" data-pc-question-index="${i}"><b>${String(i + 1).padStart(2, '0')}</b><span>${esc(item.title)}<small>${esc(item.type)}</small></span><em>${item.count} 份</em></button>`).join('')}</nav><article class="pc-question-detail"><div class="pc-question-detail-head"><div><span>第 ${index + 1} 题 · ${esc(question.type)}</span><h3>${esc(question.title)}</h3></div><strong>${question.count}<small>有效回答</small></strong></div>${view.selected.length ? question.kind === 'file' ? `<div class="jump-stat-metrics"><span>适用答卷 <b>${question.applicableCount}</b></span><span>逻辑跳过 <b>${question.skippedCount}</b></span><span>未作答 <b>${question.unansweredCount}</b></span></div>${fileBody(question, survey, index, filter)}` : questionStatBody(question, survey.id, index) : '<div class="stats-no-task">当前筛选条件下暂无题目数据</div>'}</article></div>` : '<div class="stats-no-task">暂无题目统计数据</div>'}</section>`;
+  }
+  function clearViewState(survey) {
+    Object.keys(state.textAnswerViews || {}).filter(value => value.startsWith(`${state.portal}:${survey.id}:`)).forEach(value => delete state.textAnswerViews[value]);
+    contextFor(survey).filePages = {};
+    if (typeof clearAttachmentSelections === 'function') clearAttachmentSelections();
+    lockedSave = null;
+  }
+  function findSurvey(id) { return CONFIG[state.portal]?.surveys.find(survey => String(survey.id) === String(id) && survey.deleted !== 1); }
+  function filteredSaveContext(surveyId, questionIndex, freeze = false) {
+    const survey = findSurvey(surveyId), index = Number(questionIndex);
+    if (!survey) return {allowed: false, survey: null, question: null, files: [], count: 0, questionIndex: index};
+    const view = buildView(survey), question = view.questions[index];
+    if (question?.kind !== 'file') return {allowed: false, survey, question, files: [], count: 0, questionIndex: index};
+    const files = selectedFileRows(survey.id, index, question.files).map((file, fileIndex) => ({...file, index: fileIndex, synthetic: false}));
+    const context = {allowed: resourceCenterAvailable(), survey, question, questionIndex: index, files, count: files.length,
+      questionFilterV111: {dimension: view.filter.dimension, selectedIds: [...view.filter.selectedIds], date: view.date, demo: view.filter.demo}};
+    if (freeze) lockedSave = {portal: state.portal, surveyId: String(survey.id), questionIndex: index, context};
+    return context;
+  }
+  function isFilterPage(surveyId) { return state.preview === 'pc' && state.page === `stats/detail/${surveyId}`; }
+  function install() {
+    if (typeof renderStatsDetailPage !== 'function' || typeof surveyResponseMetadata !== 'function') return;
+    if (!installed) {
+      installed = true;
+      baseRender = renderStatsDetailPage; baseMetadata = surveyResponseMetadata;
+      baseSaveContext = selectedSaveContext; baseAttachmentFiles = selectedAttachmentFiles;
+    }
+    renderStatsDetailPage = renderFilteredDetail;
+    surveyResponseMetadata = metadataWithSnapshot;
+    selectedSaveContext = saveContextWithFilter;
+    selectedAttachmentFiles = attachmentsWithFilter;
+    document.documentElement.dataset.questionFilterV111 = 'ready';
+  }
+  function renderFilteredDetail(survey = statsSurvey()) {
+    const markup = baseRender(survey);
+    if (!survey || state.preview !== 'pc') return markup;
+    const template = document.createElement('template');
+    template.innerHTML = markup;
+    const section = template.content.querySelector('.pc-question-section');
+    if (section) {
+      try { section.outerHTML = sectionMarkup(buildView(survey)); }
+      catch (error) {
+        const filter = contextFor(survey);
+        track('survey_question_filter_error', survey, {dimension: filter.dimension, selected_count: filter.selectedIds.length,
+          result_count: 0, stats_date: isDailySurvey(survey) ? selectedStatsDate(survey) : '', reason: 'aggregation_failed'});
+        section.outerHTML = '<section class="pc-question-section qf-v111"><h2>题目数据</h2><div class="stats-no-task" role="alert">题目数据加载失败，请刷新后重试</div></section>';
+      }
+    }
+    return template.innerHTML;
+  }
+  function metadataWithSnapshot(survey, answers, taskContext) {
+    return {...baseMetadata(survey, answers), respondentSnapshot: taskSnapshot(survey, answers, taskContext)};
+  }
+  function saveContextWithFilter(surveyId, questionIndex) {
+    if (isFilterPage(surveyId)) {
+      if (lockedSave?.portal === state.portal && lockedSave.surveyId === String(surveyId) && lockedSave.questionIndex === Number(questionIndex)) return lockedSave.context;
+      return filteredSaveContext(surveyId, questionIndex);
+    }
+    return baseSaveContext(surveyId, questionIndex);
+  }
+  function attachmentsWithFilter(context) {
+    return context.question?.__questionFilterV111 ? (context.files || selectedFileRows(context.survey.id, context.questionIndex, context.question.files || [])).map((file, index) => ({...file, index, synthetic: false})) : baseAttachmentFiles(context);
+  }
+  document.addEventListener('click', event => {
+    const root = event.target.closest?.('[data-v111-question-filter]');
+    if (!root || state.preview !== 'pc') return;
+    const survey = findSurvey(root.dataset.surveyId);
+    if (!survey) return;
+    const filter = contextFor(survey), dimension = event.target.closest('[data-qf-dimension]'), demo = event.target.closest('[data-qf-demo]'), page = event.target.closest('[data-qf-file-page]');
+    if (event.target.closest('[data-save-assets]')) {
+      const button = event.target.closest('[data-save-assets]'), context = filteredSaveContext(survey.id, button.dataset.questionIndex, true);
+      track('survey_question_attachment_save', survey, {dimension: filter.dimension, selected_count: filter.selectedIds.length,
+        result_count: buildView(survey).selected.length, stats_date: context.questionFilterV111.date,
+        file_count: context.count, data_source: filter.demo ? 'demo' : 'responses'});
+    }
+    if (dimension) {
+      if (filter.dimension === dimension.dataset.qfDimension) return;
+      filter.dimension = dimension.dataset.qfDimension; filter.selectedIds = []; clearViewState(survey);
+      trackChange(survey, filter); renderShell();
+    } else if (demo) {
+      filter.demo = !filter.demo; clearViewState(survey);
+      track('survey_question_demo_toggle', survey, {enabled: filter.demo, dimension: filter.dimension, selected_count: filter.selectedIds.length,
+        result_count: buildView(survey).selected.length, stats_date: isDailySurvey(survey) ? selectedStatsDate(survey) : ''}); renderShell();
+    } else if (page) { filter.filePages[page.dataset.qfQuestion] = Math.max(1, Number(page.dataset.qfFilePage)); renderShell(); }
+  }, true);
+  document.addEventListener('change', event => {
+    const input = event.target, root = input.closest?.('[data-v111-question-filter]');
+    if (!root || !input.matches('[data-qf-id],[data-qf-all],[data-qf-file-id],[data-qf-select-files]')) return;
+    const survey = findSurvey(root.dataset.surveyId);
+    if (!survey) return;
+    const filter = contextFor(survey);
+    if (input.matches('[data-qf-file-id],[data-qf-select-files]')) {
+      const index = Number(input.dataset.qfSelectFiles ?? input.dataset.qfQuestion), files = buildView(survey).questions[index]?.files || [];
+      const selection = attachmentSelection(survey.id, index, files.length);
+      if (input.matches('[data-qf-select-files]')) { selection.all = input.checked; selection.ids.clear(); selection.excluded.clear(); }
+      else {
+        if (selection.all) input.checked ? selection.excluded.delete(input.dataset.qfFileId) : selection.excluded.add(input.dataset.qfFileId);
+        else input.checked ? selection.ids.add(input.dataset.qfFileId) : selection.ids.delete(input.dataset.qfFileId);
+      }
+      lockedSave = null; renderShell(); return;
+    }
+    if (input.matches('[data-qf-all]')) filter.selectedIds = [];
+    else if (input.checked) filter.selectedIds = unique([...filter.selectedIds, input.dataset.qfId]);
+    else filter.selectedIds = filter.selectedIds.filter(id => id !== input.dataset.qfId);
+    clearViewState(survey);
+    trackChange(survey, filter); renderShell();
+  });
+  window.addEventListener('hashchange', () => { lockedSave = null; });
+  window.SurveyQuestionFilterV111 = {version: RELEASE, unclassifiedId: UNCLASSIFIED, buildView, actualRecords, taskSnapshot, matches,
+    contextFor, filteredSaveContext, install, setTaskContext(surveyId, context) {
+      const taskKey = `${state.portal}:${surveyId}`;
+      if (context == null) taskContexts.delete(taskKey); else taskContexts.set(taskKey, clone(context));
+    }};
+  install();
+  document.addEventListener('DOMContentLoaded', () => { install(); if (state.portal) renderShell(); });
+})();
