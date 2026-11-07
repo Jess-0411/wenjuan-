@@ -14,9 +14,18 @@
     const row = {event, portal: state.portal, device: state.preview, survey_id: survey?.id, timestamp: now(), ...properties};
     (window.__surveyQuestionFilterEvents ||= []).push(row);
   }
+  const fieldKey = dimension => dimension === 'grade' ? 'gradeIds' : 'departmentIds';
+  const dimensions = () => state.portal === 'school' ? ['department', 'grade'] : ['department'];
+  const valuesFor = filter => ({departmentIds: unique(filter.departmentIds), gradeIds: unique(filter.gradeIds)});
+  function filterProperties(filter) {
+    const values = valuesFor(filter);
+    return {department_ids: values.departmentIds, grade_ids: values.gradeIds,
+      department_count: values.departmentIds.length, grade_count: values.gradeIds.length,
+      selected_count: values.departmentIds.length + values.gradeIds.length};
+  }
   function trackChange(survey, filter) {
     const view = buildView(survey, filter);
-    track('survey_question_filter_change', survey, {dimension: filter.dimension, selected_count: filter.selectedIds.length,
+    track('survey_question_filter_change', survey, {...filterProperties(filter),
       result_count: view.selected.length, stats_date: view.date, data_source: filter.demo ? 'demo' : 'responses'});
   }
   function departments(portal = state.portal) {
@@ -24,11 +33,13 @@
     return rows.map(row => ({id: String(row.id || row.departmentId || ''), name: row.name || row.departmentName || '', parentId: String(row.parentId || ''), nodeType: 'department'})).filter(row => row.id);
   }
   function contextFor(survey) {
-    if (!filters.has(key(survey))) filters.set(key(survey), {dimension: 'all', selectedIds: [], demo: false, filePages: {}});
+    if (!filters.has(key(survey))) filters.set(key(survey), {departmentIds: [], gradeIds: [], demo: false, filePages: {}});
     return filters.get(key(survey));
   }
   function pendingFor(filter) {
-    return filter.pending ||= {dimension: filter.dimension, selectedIds: [...filter.selectedIds], treeOpen: false, search: '', collapsed: []};
+    return filter.pending ||= {...valuesFor(filter), trees: {
+      department: {treeOpen: false, search: '', collapsed: []}, grade: {treeOpen: false, search: '', collapsed: []}
+    }};
   }
   function treeFor(records, dimension) {
     const options = optionsFor(records, dimension), nodes = new Map();
@@ -79,15 +90,19 @@
       return `<div class="qf-tree-node" role="treeitem" aria-checked="${mixed ? 'mixed' : checked}" ${node.children.length ? `aria-expanded="${expanded}"` : ''}><div class="qf-tree-row" style="--qf-depth:${depth}">${node.children.length ? `<button type="button" class="qf-tree-expand" data-qf-expand="${esc(node.id)}" aria-label="${expanded ? '收起' : '展开'}${esc(node.name)}">${expanded ? '▾' : '▸'}</button>` : '<span class="qf-tree-spacer"></span>'}<label><input type="checkbox" data-qf-node="${esc(node.id)}" ${node.selectable ? `data-qf-id="${esc(node.id)}"` : ''} ${checked ? 'checked' : ''} ${mixed ? 'data-qf-indeterminate' : ''} ${node.valueIds.length ? '' : 'disabled'}><span>${esc(node.name)}</span></label></div>${expanded ? node.children.map(child => row(child, depth + 1, visited)).join('') : ''}</div>`;
     }
     const body = tree.roots.map(node => row(node, 0)).join('');
-    return `<div class="qf-tree-search"><input type="search" data-qf-search value="${esc(pending.search)}" placeholder="搜索部门或年级" aria-label="搜索筛选范围"></div><div class="qf-tree-list" role="tree" aria-multiselectable="true">${body || '<div class="qf-tree-empty">无匹配结果</div>'}</div>`;
+    return `<div class="qf-tree-search"><input type="search" data-qf-search value="${esc(pending.search)}" placeholder="搜索" aria-label="搜索筛选范围"></div><div class="qf-tree-list" role="tree" aria-multiselectable="true">${body || '<div class="qf-tree-empty">无匹配结果</div>'}</div>`;
   }
   function filterFormMarkup(view) {
-    const pending = pendingFor(view.filter), dimensions = state.portal === 'school' ? [['all', '全部'], ['department', '部门'], ['grade', '年级']] : [['all', '全部'], ['department', '机关部门']];
-    const tree = treeFor(view.records, pending.dimension), names = pending.selectedIds.map(id => tree.nodes.get(id)?.name || id);
-    const labelText = pending.dimension === 'grade' ? '年级' : state.portal === 'bureau' ? '机关部门' : '部门';
-    const selectedText = names.length ? names.slice(0, 2).join('、') + (names.length > 2 ? ` 等${names.length}项` : '') : `全部${labelText}`;
-    const dirty = pending.dimension !== view.filter.dimension || [...pending.selectedIds].sort().join('|') !== [...view.filter.selectedIds].sort().join('|');
-    return `<div class="qf-filter-form"><div class="qf-form-fields"><label class="qf-form-field"><span>查看维度：</span><select class="select" data-qf-dimension-select aria-label="查看维度">${dimensions.map(([id, name]) => `<option value="${id}" ${pending.dimension === id ? 'selected' : ''}>${name}</option>`).join('')}</select></label>${pending.dimension === 'all' ? '' : `<div class="qf-form-field"><span>${labelText}：</span><div class="qf-tree-select"><div class="qf-tree-input"><button type="button" data-qf-tree-toggle aria-haspopup="tree" aria-expanded="${pending.treeOpen}" title="${esc(names.join('、') || selectedText)}">${esc(selectedText)}<i>⌄</i></button>${names.length ? '<button type="button" class="qf-tree-clear" data-qf-clear aria-label="清空筛选范围">×</button>' : ''}</div>${pending.treeOpen ? `<div class="qf-tree-popover">${treeMarkup(tree, pending)}</div>` : ''}</div></div>`}<div class="qf-form-actions"><button type="button" class="btn green" data-qf-query>⌕ 查询</button><button type="button" class="btn" data-qf-reset>↻ 重置</button></div></div><div class="qf-query-status"><span ${dirty ? 'class="qf-pending-note"' : ''}>${dirty ? '筛选条件已修改，点击查询后生效' : `当前结果：${view.filter.dimension === 'all' ? '全部答卷' : view.filter.dimension === 'grade' ? '按年级' : '按部门'}`}</span><span>${view.selected.length} 份有效答卷</span></div></div>`;
+    const pending = pendingFor(view.filter);
+    const fields = dimensions().map(dimension => {
+      const tree = treeFor(view.records, dimension), treeState = pending.trees[dimension], selectedIds = pending[fieldKey(dimension)];
+      const names = selectedIds.map(id => tree.nodes.get(id)?.name || id), labelText = dimension === 'grade' ? '年级' : '部门';
+      const selectedText = names.length ? names.slice(0, 2).join('、') + (names.length > 2 ? ` 等${names.length}项` : '') : '全部';
+      return `<div class="qf-form-field" data-qf-field="${dimension}"><span>${labelText}：</span><div class="qf-tree-select"><div class="qf-tree-input"><button type="button" data-qf-tree-toggle="${dimension}" aria-label="${labelText}：${esc(selectedText)}" aria-haspopup="tree" aria-expanded="${treeState.treeOpen}" title="${esc(names.join('、') || selectedText)}">${esc(selectedText)}<i>⌄</i></button>${names.length ? `<button type="button" class="qf-tree-clear" data-qf-clear aria-label="清空${labelText}">×</button>` : ''}</div>${treeState.treeOpen ? `<div class="qf-tree-popover">${treeMarkup(tree, {...treeState, selectedIds})}</div>` : ''}</div></div>`;
+    }).join('');
+    const dirty = dimensions().some(dimension => [...pending[fieldKey(dimension)]].sort().join('|') !== [...view.filter[fieldKey(dimension)]].sort().join('|'));
+    const scope = view.filter.departmentIds.length && view.filter.gradeIds.length ? '部门与年级（交集）' : view.filter.departmentIds.length ? '按部门' : view.filter.gradeIds.length ? '按年级' : '全部答卷';
+    return `<div class="qf-filter-form"><div class="qf-form-fields">${fields}<div class="qf-form-actions"><button type="button" class="btn green" data-qf-query>⌕ 查询</button><button type="button" class="btn" data-qf-reset>↻ 重置</button></div></div><div class="qf-query-status"><span ${dirty ? 'class="qf-pending-note"' : ''}>${dirty ? '筛选条件已修改，点击查询后生效' : `当前结果：${scope}`}</span><span>${view.selected.length} 份有效答卷</span></div></div>`;
   }
   function markMixed(root = document) { root.querySelectorAll('[data-qf-indeterminate]').forEach(input => { input.indeterminate = true; }); }
   function refreshFilterForm(survey) {
@@ -170,12 +185,19 @@
     if (dimension === 'grade') return snapshot?.gradeId ? [String(snapshot.gradeId)] : [];
     return unique(snapshot?.departmentIds || snapshot?.departments?.map(row => row.id || row.departmentId));
   }
+  function matchesDimension(record, dimension, selectedIds) {
+    if (!selectedIds.length) return true;
+    if (!applicable(record, dimension)) return false;
+    const ids = membershipIds(record, dimension);
+    return ids.length ? ids.some(id => selectedIds.includes(id)) : selectedIds.includes(UNCLASSIFIED);
+  }
+  function validateFilter(filter) {
+    if (state.portal === 'bureau' && filter.gradeIds?.length) throw new Error('教育局端不支持年级筛选');
+  }
   function matches(record, filter) {
-    if (filter.dimension === 'all') return true;
-    if (!applicable(record, filter.dimension)) return false;
-    if (!filter.selectedIds.length) return true;
-    const ids = membershipIds(record, filter.dimension);
-    return ids.length ? ids.some(id => filter.selectedIds.includes(id)) : filter.selectedIds.includes(UNCLASSIFIED);
+    validateFilter(filter);
+    const values = valuesFor(filter);
+    return matchesDimension(record, 'department', values.departmentIds) && matchesDimension(record, 'grade', values.gradeIds);
   }
   function optionsFor(records, dimension) {
     const rows = new Map();
@@ -228,6 +250,7 @@
     return String(value || '').split('、').filter(Boolean).map(name => ({name}));
   }
   function buildView(survey, filter = contextFor(survey)) {
+    validateFilter(filter);
     const qs = questions(survey), date = isDailySurvey(survey) ? selectedStatsDate(survey) : '';
     const records = (isDailySurvey(survey) && !date ? [] : filter.demo ? demoRecords(survey, qs, date) : actualRecords(survey))
       .filter(record => !date || String(record.submittedAt || '').slice(0, 10) === date);
@@ -247,7 +270,7 @@
       if (kind === 'location') return {...base, locations: unique(values).map(value => ({name: value, count: values.filter(item => item === value).length, address: value, coordinate: ['—', '—']}))};
       return base;
     });
-    return {survey, filter, date, records, selected, questions: result, options: filter.dimension === 'all' ? [] : optionsFor(records, filter.dimension)};
+    return {survey, filter, date, records, selected, questions: result, options: Object.fromEntries(dimensions().map(dimension => [dimension, optionsFor(records, dimension)]))};
   }
   function fileBody(question, survey, index, filter) {
     const files = question.files || [], pageCount = Math.max(1, Math.ceil(files.length / 8)), page = Math.min(filter.filePages[index] || 1, pageCount);
@@ -269,7 +292,7 @@
     return `<section class="pc-question-section qf-v111" data-v111-question-filter data-survey-id="${survey.id}"><div class="pc-section-head"><div><h2>题目数据</h2></div><button class="link-btn qf-demo-toggle" type="button" data-qf-demo>${filter.demo ? '返回答卷数据' : '查看筛选演示'}</button></div>
       ${filter.demo ? '<div class="qf-demo-notice" role="note"><b>筛选演示</b><span>当前为独立样例答卷，不计入问卷统计、人员明细与导出。</span></div>' : ''}
       ${filterFormMarkup(view)}
-      ${filter.dimension === 'grade' ? '<p class="qf-scope-note">年级仅统计学生及对应学生家长的答卷；教职工答卷不计入年级。</p>' : filter.dimension === 'department' ? `<p class="qf-scope-note">${state.portal === 'bureau' ? '仅统计教育局机关人员的部门归属。' : '按教职工提交时的部门归属统计。'}未归类仅含缺少归属的内部答卷。</p>` : ''}
+      ${filter.departmentIds.length || filter.gradeIds.length ? `<p class="qf-scope-note">${state.portal === 'bureau' ? '按本机关教职工提交时的部门归属筛选。' : '部门按教职工归属筛选，年级仅纳入学生及对应学生家长；同时选择部门与年级时取交集。'}未归类仅含缺少归属的内部答卷。</p>` : ''}
       ${question ? `<div class="pc-question-layout"><nav class="pc-question-nav">${qs.map((item, i) => `<button class="${index === i ? 'active' : ''}" data-pc-question-index="${i}"><b>${String(i + 1).padStart(2, '0')}</b><span>${esc(item.title)}<small>${esc(item.type)}</small></span><em>${item.count} 份</em></button>`).join('')}</nav><article class="pc-question-detail"><div class="pc-question-detail-head"><div><span>第 ${index + 1} 题 · ${esc(question.type)}</span><h3>${esc(question.title)}</h3></div><strong>${question.count}<small>有效回答</small></strong></div>${view.selected.length ? question.kind === 'file' ? `<div class="jump-stat-metrics"><span>适用答卷 <b>${question.applicableCount}</b></span><span>逻辑跳过 <b>${question.skippedCount}</b></span><span>未作答 <b>${question.unansweredCount}</b></span></div>${fileBody(question, survey, index, filter)}` : questionStatBody(question, survey.id, index) : '<div class="stats-no-task">当前筛选条件下暂无题目数据</div>'}</article></div>` : '<div class="stats-no-task">暂无题目统计数据</div>'}</section>`;
   }
   function clearViewState(survey) {
@@ -286,7 +309,7 @@
     if (question?.kind !== 'file') return {allowed: false, survey, question, files: [], count: 0, questionIndex: index};
     const files = selectedFileRows(survey.id, index, question.files).map((file, fileIndex) => ({...file, index: fileIndex, synthetic: false}));
     const context = {allowed: resourceCenterAvailable(), survey, question, questionIndex: index, files, count: files.length,
-      questionFilterV111: {dimension: view.filter.dimension, selectedIds: [...view.filter.selectedIds], date: view.date, demo: view.filter.demo}};
+      questionFilterV111: {...valuesFor(view.filter), date: view.date, demo: view.filter.demo}};
     if (freeze) lockedSave = {portal: state.portal, surveyId: String(survey.id), questionIndex: index, context};
     return context;
   }
@@ -314,7 +337,7 @@
       try { section.outerHTML = sectionMarkup(buildView(survey)); }
       catch (error) {
         const filter = contextFor(survey);
-        track('survey_question_filter_error', survey, {dimension: filter.dimension, selected_count: filter.selectedIds.length,
+        track('survey_question_filter_error', survey, {...filterProperties(filter),
           result_count: 0, stats_date: isDailySurvey(survey) ? selectedStatsDate(survey) : '', reason: 'aggregation_failed'});
         section.outerHTML = '<section class="pc-question-section qf-v111"><h2>题目数据</h2><div class="stats-no-task" role="alert">题目数据加载失败，请刷新后重试</div></section>';
       }
@@ -343,35 +366,38 @@
     const filter = contextFor(survey), pending = pendingFor(filter), demo = event.target.closest('[data-qf-demo]'), page = event.target.closest('[data-qf-file-page]');
     if (event.target.closest('[data-save-assets]')) {
       const button = event.target.closest('[data-save-assets]'), context = filteredSaveContext(survey.id, button.dataset.questionIndex, true);
-      track('survey_question_attachment_save', survey, {dimension: filter.dimension, selected_count: filter.selectedIds.length,
+      track('survey_question_attachment_save', survey, {...filterProperties(filter),
         result_count: buildView(survey).selected.length, stats_date: context.questionFilterV111.date,
         file_count: context.count, data_source: filter.demo ? 'demo' : 'responses'});
     }
     if (event.target.closest('[data-qf-query],[data-qf-reset]')) {
       const reset = Boolean(event.target.closest('[data-qf-reset]'));
-      filter.dimension = reset ? 'all' : pending.dimension;
-      filter.selectedIds = reset ? [] : unique(pending.selectedIds);
-      filter.pending = {dimension: filter.dimension, selectedIds: [...filter.selectedIds], treeOpen: false, search: '', collapsed: []};
+      Object.assign(filter, reset ? {departmentIds: [], gradeIds: []} : valuesFor(pending));
+      delete filter.pending;
       clearViewState(survey); trackChange(survey, filter);
-      track(reset ? 'survey_question_filter_reset' : 'survey_question_filter_query', survey, {dimension: filter.dimension, node_ids: [...filter.selectedIds]});
+      track(reset ? 'survey_question_filter_reset' : 'survey_question_filter_query', survey, filterProperties(filter));
       renderShell();
-    } else if (event.target.closest('[data-qf-tree-toggle]')) {
-      pending.treeOpen = !pending.treeOpen; refreshFilterForm(survey);
-    } else if (event.target.closest('[data-qf-clear]')) {
-      pending.selectedIds = []; refreshFilterForm(survey);
-    } else if (event.target.closest('[data-qf-expand]')) {
-      const id = event.target.closest('[data-qf-expand]').dataset.qfExpand;
-      pending.collapsed = pending.collapsed.includes(id) ? pending.collapsed.filter(value => value !== id) : [...pending.collapsed, id];
+    } else if (event.target.closest('[data-qf-tree-toggle],[data-qf-clear],[data-qf-expand]')) {
+      const dimension = event.target.closest('[data-qf-field]').dataset.qfField, treeState = pending.trees[dimension];
+      if (event.target.closest('[data-qf-tree-toggle]')) {
+        const open = !treeState.treeOpen;
+        Object.values(pending.trees).forEach(tree => { tree.treeOpen = false; });
+        treeState.treeOpen = open;
+      } else if (event.target.closest('[data-qf-clear]')) pending[fieldKey(dimension)] = [];
+      else {
+        const id = event.target.closest('[data-qf-expand]').dataset.qfExpand;
+        treeState.collapsed = treeState.collapsed.includes(id) ? treeState.collapsed.filter(value => value !== id) : [...treeState.collapsed, id];
+      }
       refreshFilterForm(survey);
     } else if (demo) {
       filter.demo = !filter.demo; clearViewState(survey);
-      track('survey_question_demo_toggle', survey, {enabled: filter.demo, dimension: filter.dimension, selected_count: filter.selectedIds.length,
+      track('survey_question_demo_toggle', survey, {enabled: filter.demo, ...filterProperties(filter),
         result_count: buildView(survey).selected.length, stats_date: isDailySurvey(survey) ? selectedStatsDate(survey) : ''}); renderShell();
     } else if (page) { filter.filePages[page.dataset.qfQuestion] = Math.max(1, Number(page.dataset.qfFilePage)); renderShell(); }
   }, true);
   document.addEventListener('change', event => {
     const input = event.target, root = input.closest?.('[data-v111-question-filter]');
-    if (!root || !input.matches('[data-qf-node],[data-qf-dimension-select],[data-qf-file-id],[data-qf-select-files]')) return;
+    if (!root || !input.matches('[data-qf-node],[data-qf-file-id],[data-qf-select-files]')) return;
     const survey = findSurvey(root.dataset.surveyId);
     if (!survey) return;
     const filter = contextFor(survey);
@@ -385,24 +411,20 @@
       }
       lockedSave = null; renderShell(); return;
     }
-    const pending = pendingFor(filter);
-    if (input.matches('[data-qf-dimension-select]')) {
-      pending.dimension = input.value; pending.selectedIds = []; pending.search = ''; pending.collapsed = []; pending.treeOpen = false;
-    } else {
-      const ids = treeFor(buildView(survey).records, pending.dimension).nodes.get(input.dataset.qfNode)?.valueIds || [];
-      pending.selectedIds = input.checked ? unique([...pending.selectedIds, ...ids]) : pending.selectedIds.filter(id => !ids.includes(id));
-    }
+    const pending = pendingFor(filter), dimension = input.closest('[data-qf-field]').dataset.qfField, field = fieldKey(dimension);
+    const ids = treeFor(buildView(survey).records, dimension).nodes.get(input.dataset.qfNode)?.valueIds || [];
+    pending[field] = input.checked ? unique([...pending[field], ...ids]) : pending[field].filter(id => !ids.includes(id));
     refreshFilterForm(survey);
   });
   document.addEventListener('input', event => {
     if (!event.target.matches?.('[data-qf-search]')) return;
     const survey = findSurvey(event.target.closest('[data-v111-question-filter]')?.dataset.surveyId);
     if (!survey) return;
-    const root = event.target.closest('[data-v111-question-filter]'), pending = pendingFor(contextFor(survey));
-    pending.search = event.target.value;
-    // Keep the live search input intact so Chinese input composition and caret survive filtering.
+    const root = event.target.closest('[data-qf-field]'), dimension = root.dataset.qfField, pending = pendingFor(contextFor(survey));
+    const treeState = pending.trees[dimension]; treeState.search = event.target.value;
+    // Preserve the live search input and Chinese input composition while updating only tree rows.
     const template = document.createElement('template');
-    template.innerHTML = treeMarkup(treeFor(buildView(survey).records, pending.dimension), pending);
+    template.innerHTML = treeMarkup(treeFor(buildView(survey).records, dimension), {...treeState, selectedIds: pending[fieldKey(dimension)]});
     root.querySelector('.qf-tree-list').outerHTML = template.content.querySelector('.qf-tree-list').outerHTML;
     markMixed(root);
   });
@@ -410,9 +432,10 @@
     if (event.type === 'keydown' && event.key !== 'Escape' || event.type === 'click' && event.target.closest?.('.qf-tree-select')) return;
     document.querySelectorAll('[data-v111-question-filter]').forEach(root => {
       const survey = findSurvey(root.dataset.surveyId), pending = survey && pendingFor(contextFor(survey));
-      if (!pending?.treeOpen) return;
-      pending.treeOpen = false; root.querySelector('.qf-tree-popover')?.remove();
-      root.querySelector('[data-qf-tree-toggle]')?.setAttribute('aria-expanded', 'false');
+      if (!pending) return;
+      Object.values(pending.trees).forEach(tree => { tree.treeOpen = false; });
+      root.querySelectorAll('.qf-tree-popover').forEach(popover => popover.remove());
+      root.querySelectorAll('[data-qf-tree-toggle]').forEach(button => button.setAttribute('aria-expanded', 'false'));
     });
   }
   document.addEventListener('click', collapseTrees);

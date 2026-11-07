@@ -23,3 +23,7 @@
 .prd-ui-reference[open]>summary{margin-bottom:10px}
 .prd-ui-reference .prd-table{font-size:11px}
 @media(max-width:720px){.prd-document[data-prd-implementation="backend"]{width:100%}.prd-backend-table{min-width:560px}.prd-rule-list{padding-left:20px}}
+
+.prd-document[data-prd-implementation="validation-only"]{width:min(1120px,calc(100vw - 48px))}
+.prd-validation-table{table-layout:fixed;width:100%}.prd-validation-table th:nth-child(1){width:9%}.prd-validation-table th:nth-child(2){width:13%}.prd-validation-table th:nth-child(3){width:46%}.prd-validation-table th:nth-child(4){width:10%}.prd-validation-table th:nth-child(5){width:22%}.prd-validation-table td{overflow-wrap:anywhere;line-height:1.75}
+.prd-validation-table th{white-space:normal;overflow-wrap:anywhere;line-height:1.6}

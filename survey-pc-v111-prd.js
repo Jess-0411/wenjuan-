@@ -21,7 +21,7 @@
       ['角色投放','失效校验','空角色不可新增选择，发布前已选角色越权、失效或无有效成员须重选；收集期变空仅停止新增资格。','P0','成员须active且canReceive=true']
     ],
     filter: [
-      ['题目数据','维度筛选','表单栏展示查看维度、范围树形多选、查询/重置；教育局全部/机关部门，学校全部/部门/年级；单维度多选OR，全部隐藏范围。','P0','年级仅学生及家长'],
+      ['题目数据','部门与年级筛选','教育局仅部门，学校同时展示部门和年级；默认全部。同字段多选OR，部门与年级AND；空数组不限制，清空不影响另一字段；查询/重置生效。','P0','教育局部门仍仅局机关；年级仅学生及家长'],
       ['题目数据','提交时归属','按可信提交快照筛选；家长对应本次学生关系，历史缺失归属为未归类，外部仅全部，教师不参与年级。','P0','不反推历史归属'],
       ['题目数据','独立统计上下文','仅更新题目统计、回答和附件；不改变顶部卡片、人员明细及下载、列表导出明细。','P0','与现有日期共同生效'],
       ['题目数据','筛选交互','待查询与已应用分离；编辑不刷新，查询生效才保留题号、重置分页并清附件，重置立即恢复全部；无命中展示空态，使用有效答卷及跳题聚合。','P0','不按人数补造分组答案'],
@@ -67,11 +67,11 @@
       '在题目数据内按部门或年级查看有效回答，支持针对性分析。',
       '教育局统计查看人按机关部门分析；学校统计查看人按部门或学生/家长年级分析。',
       '', '',
-      '学校全部/部门/年级，教育局全部/机关部门。树形多选支持搜索、展开、半选、清空；父选覆盖自身与全部下级适用节点，年级树为学校→学段→年级，不增加班级。搜索只影响展示，历史归属独立分组，未归类独立选项。编辑保留原结果及附件；点击查询才应用，保留题号、重置分页及附件选择，重置立即恢复全部。全部含有效内外部答卷；具体维度只匹配提交快照，外部不纳入未归类。教师不进入年级或年级未归类。',
+      '学校同时展示部门、年级，教育局仅部门，删除查看维度；字段默认全部，清空恢复全部，搜索提示统一为搜索。同字段多选取并集，部门与年级取交集，两个选择同时保留。两项全部包含有效内外部答卷，任一具体条件排除外部；具体部门与具体年级通常为空，按谓词正常返回空态；双未归类按历史unknown兼容规则匹配。树形多选支持搜索、展开、半选、清空；父选覆盖自身与全部下级适用节点，年级树为学校→学段→年级，不增加班级。搜索只影响展示，历史归属独立分组，未归类独立选项。编辑保留原结果及附件；点击查询才应用，保留题号、重置分页及附件选择，重置立即恢复全部。全部含有效内外部答卷；具体维度只匹配提交快照，外部不纳入未归类。教师不进入年级或年级未归类。',
       '历史无归属标为未归类；家长对应学生不明时不扩展至全部子女。已改名/删除归属按快照保留，无结果显示空态；逻辑跳过、未答、有效回答分别统计。',
       'respondentSnapshot保存提交时任务身份、departmentIds/Names、gradeId/Name及studentId/relationId/schoolId。PC、移动和二维码提交统一写入。按答卷ID去重，保留现有日期规则；记录survey_question_filter_change及survey_question_filter_error，不记录答案。',
       '使用独立题目筛选上下文，不能修改全局统计或导出口径。生产接口由服务端校验组织与答卷权限；历史无快照不迁移反推。筛选演示使用独立标记记录，与真实答卷、顶部统计及导出隔离。',
-      '两端差异、单维度多选、身份限制、历史快照、空态及跳题统计正确；附件操作只覆盖筛选结果且含分页外数据；顶部卡片、人员下载及列表导出明细不受影响。'
+      '两端字段差异、同字段多选并集、双字段交集、默认全部、清空独立、身份限制、历史快照、空态及跳题统计正确；附件操作只覆盖筛选结果且含分页外数据；顶部卡片、人员下载及列表导出明细不受影响。'
     ]
   };
   const scopes = {
@@ -121,7 +121,10 @@
     const wrapped = function(rule,key,type) {
       const modules=moduleKeys(key,type);
       if (!modules.length) return base(rule,key,type);
-      if (type==='overlay' && ['excel-import','role-picker'].includes(key)) {
+      if (type==='overlay' && key==='excel-import') {
+        return `<article class="prd-document" data-prd-version="V1.11" data-prd-implementation="validation-only"><header class="prd-document-head"><h2>导入校验规则</h2><button type="button" class="prd-close" aria-label="关闭 PRD 规则">×</button></header>${prdTable(['功能模块','功能点','需求描述','优先级（P0 / P1 / P2）','备注说明'],backendRules().excel.validationRules,'prd-validation-table')}</article>`;
+      }
+      if (type==='overlay' && key==='role-picker') {
         return `<article class="prd-document" data-prd-version="V1.11" data-prd-implementation="backend"><header class="prd-document-head"><h2>${esc(rule?.title||'PC优化规则')}</h2><button type="button" class="prd-close" aria-label="关闭 PRD 规则">×</button></header><div class="prd-version-note">PRD V1.11 · 更新日期 2026-11-07 · 后端实现规则</div>${implementationNotice(modules)}${chapters.map((title,i)=>`<section><h3>${title}</h3>${addition(i,modules)}</section>`).join('')}</article>`;
       }
       let existing=base(rule,key,type);
