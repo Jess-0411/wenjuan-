@@ -18,7 +18,10 @@
 .survey-excel-error-table table{border-collapse:collapse;width:100%;table-layout:fixed;background:#fff;font-size:12px}
 .survey-excel-error-table th,.survey-excel-error-table td{padding:9px 10px;text-align:left;border-bottom:1px solid #f0e1df;vertical-align:top;overflow-wrap:anywhere}
 .survey-excel-error-table th{position:sticky;top:0;background:#fff4f2;font-weight:500;color:#8c4c46;z-index:1}
-.survey-excel-error-table th:nth-child(1){width:72px}.survey-excel-error-table th:nth-child(2){width:40px}.survey-excel-error-table th:nth-child(3){width:75px}
+.survey-excel-error-table th:nth-child(1){width:110px}.survey-excel-error-table th:nth-child(2){width:56px}
+.survey-excel-file-info{display:flex;gap:12px;align-items:baseline;line-height:1.7;font-size:14px;overflow-wrap:anywhere}.survey-excel-file-info>span{color:#8190a2;white-space:nowrap}.survey-excel-file-info>strong{font-weight:500}
+.survey-excel-progress{margin:22px 0 18px}.survey-excel-progress>div{display:flex;justify-content:space-between;gap:16px;font-size:13px;margin-bottom:10px}.survey-excel-progress b{font-weight:500}.survey-excel-progress span{color:#8190a2}.survey-excel-progress progress{appearance:auto;width:100%;height:8px;accent-color:#16866b}
+.survey-excel-dialog button:disabled{cursor:not-allowed;opacity:.5}
 .survey-excel-dialog>footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 26px;border-top:1px solid #e7ecf1;background:#fafbfd;flex-shrink:0}
 .survey-excel-dialog .overlay-prd-trigger{position:absolute;right:65px;top:23px;z-index:2}
 .survey-excel-dialog button:focus-visible,.survey-excel-upload:focus-within{outline:2px solid #3c8bc7;outline-offset:3px}

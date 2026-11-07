@@ -337,6 +337,7 @@
     catch (error) { track('excel_template_download', {result: 'failed'}); toast(error.message || '模板下载失败，请重试'); return false; }
   }
   async function readFile(file, options = {}) {
+    options.onProgress?.('正在读取文件');
     if (!file || !/\.(xlsx|xls)$/i.test(file.name || '')) return {ok: false, errors: [errorRow('文件', '', '', '仅支持 .xlsx、.xls 文件')]};
     if (!file.size || file.size > MAX_BYTES) return {ok: false, errors: [errorRow('文件', '', '', file.size ? '文件不能超过 5 MB' : '文件内容为空')]};
     if (typeof XLSX === 'undefined') return {ok: false, errors: [errorRow('文件', '', '', 'Excel 组件加载失败，请刷新后重试')]};
@@ -350,7 +351,13 @@
       const zip = bytes[0] === 0x50 && bytes[1] === 0x4b;
       const biff = bytes[0] === 0x09 && [0x00, 0x02, 0x04, 0x08].includes(bytes[1]);
       if ((!zip && !compound && !biff) || (/\.xlsx$/i.test(file.name) && !zip)) throw new Error('文件不是有效的 Excel 工作簿');
+      options.onProgress?.('正在解析工作簿');
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      if (options.cancelled?.()) return null;
       const book = XLSX.read(buffer, {type: 'array', bookVBA: true, bookFiles: true, cellFormula: true});
+      options.onProgress?.('正在校验基本信息与问卷内容');
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      if (options.cancelled?.()) return null;
       return parseWorkbook(book, options);
     } catch (error) {
       return {ok: false, errors: [errorRow('文件', '', '', /password|encrypt|FilePass/i.test(error.message || '') ? '不支持密码保护或加密文件，请解除保护后上传' : '文件读取失败，请检查文件是否损坏并使用下载模板')]};
@@ -383,56 +390,81 @@
 
   function renderDialog() {
     if (!dialog) return;
-    const current = dialog, summary = current.parsed?.ok ? `<div class="survey-excel-success" role="status">校验通过：${escape(current.parsed.value.title)}，共 ${current.parsed.value.questions.length} 道题。确认导入后自动保存为草稿。</div>` : '';
-    const errors = current.errors.length ? `<div class="survey-excel-errors" role="alert"><b>共 ${current.errors.length} 项错误，请修改 Excel 后重新上传</b><div class="survey-excel-error-table"><table><thead><tr><th>工作表</th><th>行号</th><th>字段</th><th>错误说明</th></tr></thead><tbody>${current.errors.map(error => `<tr><td>${escape(error.sheet)}</td><td>${escape(error.row || '—')}</td><td>${escape(error.column || '—')}</td><td>${escape(error.message)}</td></tr>`).join('')}</tbody></table></div></div>` : '';
-    current.layer.innerHTML = `<section class="survey-excel-dialog" role="dialog" aria-modal="true" aria-labelledby="survey-excel-title" data-prd-overlay="excel-import"><header><h2 id="survey-excel-title">Excel 导入</h2><button type="button" class="survey-excel-close" data-excel-close aria-label="关闭 Excel 导入">×</button></header><div class="survey-excel-body"><p>模板已预填基本信息及七种题型示例，可修改或删除后导入。问卷类型、题目类型、是否必填均可下拉选择；单选、多选按选项1～20每格填写一项。</p><button type="button" class="btn" data-excel-download>下载模版</button><label class="survey-excel-upload ${current.busy ? 'is-busy' : ''}"><input type="file" accept=".xlsx,.xls" data-excel-file ${current.busy ? 'disabled' : ''}><strong>${current.busy ? '正在读取并校验…' : current.file ? escape(current.file.name) : '点击选择 Excel 文件'}</strong><span>支持 .xlsx、.xls，文件不超过 5 MB</span></label><p class="survey-excel-note">导入成功后进入第 1 步；接收人员和收集设置需手动配置。日期时分、仅图片和选项跳转可在问卷设计中继续设置。</p>${summary}${errors}</div><footer><button type="button" class="btn" data-excel-close>取消</button><button type="button" class="btn primary" data-excel-confirm ${current.busy || !current.parsed?.ok ? 'disabled' : ''}>${current.busy ? '校验中…' : '确认导入'}</button></footer></section>`;
+    const current = dialog, uploading = current.phase === 'upload', saving = current.phase === 'saving', validating = current.phase === 'validating';
+    const summary = current.phase === 'ready' ? `<div class="survey-excel-success" role="status"><b>校验通过</b><br>问卷名称：${escape(current.parsed.value.title)}<br>题目数量：${current.parsed.value.questions.length} 道<br>确认导入后才创建并保存草稿；接收人员和收集设置需手动配置。</div>` : '';
+    const errors = current.errors.length ? `<div class="survey-excel-errors" role="alert"><b>共 ${current.errors.length} 项问题，本次未创建草稿</b><div class="survey-excel-error-table"><table><thead><tr><th>页面（工作表）</th><th>第几行</th><th>问题原因</th></tr></thead><tbody>${current.errors.map(error => `<tr><td>${escape(error.sheet)}</td><td>${escape(error.row || '—')}</td><td>${escape([error.column || error.field, error.message || error.reason].filter(Boolean).join('：'))}</td></tr>`).join('')}</tbody></table></div></div>` : '';
+    const uploadBody = `<p>模板已预填基本信息及七种题型示例，可修改或删除后导入。问卷类型、题目类型、是否必填均可下拉选择；单选、多选按选项1～20每格填写一项。</p><button type="button" class="btn" data-excel-download>下载模版</button><label class="survey-excel-upload"><input type="file" accept=".xlsx,.xls" data-excel-file><strong>${current.file ? escape(current.file.name) : '点击选择 Excel 文件'}</strong><span>${current.file ? `${(current.file.size / 1024).toFixed(1)} KB · 可点击重新选择` : '支持 .xlsx、.xls，文件不超过 5 MB'}</span></label><p class="survey-excel-note">选择文件后点击“开始导入”进行完整校验。导入成功后进入第 1 步，日期时分、仅图片和选项跳转可在问卷设计中继续设置。</p>`;
+    const resultBody = `<div class="survey-excel-file-info"><span>导入文件</span><strong>${escape(current.file?.name || '')}</strong></div><div class="survey-excel-progress" role="status" aria-live="polite"><div><b>${escape(current.stage)}</b><span>${validating || saving ? '处理中' : '100%'}</span></div><progress ${validating || saving ? '' : 'value="100"'} max="100" aria-label="导入处理进度"></progress></div>${validating ? '<p class="survey-excel-note">正在读取、解析并校验文件；校验完成后需确认导入。本阶段可取消，不创建草稿。</p>' : ''}${summary}${errors}`;
+    const action = uploading ? `<button type="button" class="btn primary" data-excel-start ${current.file ? '' : 'disabled'}>开始导入</button>`
+      : current.phase === 'invalid' ? '<button type="button" class="btn primary" data-excel-retry>重新导入</button>'
+      : `<button type="button" class="btn primary" data-excel-confirm ${current.phase !== 'ready' ? 'disabled' : ''}>${saving ? '正在保存…' : validating ? '校验中…' : '确认导入'}</button>`;
+    current.layer.innerHTML = `<section class="survey-excel-dialog" role="dialog" aria-modal="true" aria-labelledby="survey-excel-title" data-prd-overlay="excel-import" data-excel-phase="${current.phase}"><header><h2 id="survey-excel-title">Excel 导入${uploading ? '' : ' · 校验与结果'}</h2><button type="button" class="survey-excel-close" data-excel-close aria-label="关闭 Excel 导入" ${saving ? 'disabled' : ''}>×</button></header><div class="survey-excel-body">${uploading ? uploadBody : resultBody}</div><footer><button type="button" class="btn" data-excel-close ${saving ? 'disabled' : ''}>取消</button>${action}</footer></section>`;
     current.layer.querySelectorAll('[data-excel-close]').forEach(button => button.onclick = () => close('button'));
-    current.layer.querySelector('[data-excel-download]').onclick = downloadTemplate;
-    current.layer.querySelector('[data-excel-file]').onchange = event => selectFile(event.target.files?.[0]);
-    current.layer.querySelector('[data-excel-confirm]').onclick = confirmImport;
+    const bind = (selector, callback) => { const button = current.layer.querySelector(selector); if (button) button.onclick = callback; };
+    bind('[data-excel-download]', downloadTemplate); bind('[data-excel-start]', startImport); bind('[data-excel-retry]', retryImport); bind('[data-excel-confirm]', confirmImport);
+    const input = current.layer.querySelector('[data-excel-file]'); if (input) input.onchange = event => selectFile(event.target.files?.[0]);
     if (typeof decorateOverlay === 'function') decorateOverlay(current.layer.querySelector('.survey-excel-dialog'), 'excel-import');
   }
   function open(trigger = null) {
     if (state.preview !== 'pc' || dialog) return false;
     state.createSurveyMenuOpen = false; renderShell();
     const layer = document.createElement('div'); layer.className = 'survey-excel-mask';
-    dialog = {layer, trigger, file: null, parsed: null, errors: [], busy: false, token: ++generation, context: `${state.portal}:${CONFIG[state.portal].org}:${CONFIG[state.portal].user}`};
+    dialog = {layer, trigger, file: null, parsed: null, errors: [], phase: 'upload', stage: '', busy: false, token: ++generation, context: `${state.portal}:${CONFIG[state.portal].org}:${CONFIG[state.portal].user}`};
     layer.onclick = event => { if (event.target === layer) close('mask'); };
     document.body.appendChild(layer); renderDialog();
     layer.querySelector('[data-excel-download]')?.focus(); track('excel_import_open'); return true;
   }
   function close(method = 'button') {
     if (!dialog) return;
+    if (dialog.phase === 'saving' && !['success', 'context_change'].includes(method)) return false;
     const current = dialog; dialog = null; generation++;
     current.layer.remove();
     if (method !== 'success') track('excel_import_cancel', {close_method: method});
     if (current.trigger?.isConnected) current.trigger.focus();
     else document.querySelector('[data-create-survey-menu-toggle]')?.focus();
   }
-  async function selectFile(file) {
-    if (!dialog || !file) return false;
-    const current = dialog, token = ++generation;
-    current.token = token; current.file = file; current.busy = true; current.parsed = null; current.errors = []; renderDialog();
+  function selectFile(file) {
+    if (!dialog || dialog.phase !== 'upload' || !file) return false;
+    const current = dialog;
+    current.file = file; current.parsed = null; current.errors = []; renderDialog();
     track('excel_import_file_select', {file_size: file.size, file_type: String(file.name || '').split('.').pop().toLowerCase()});
-    const startedAt = Date.now(), parsed = await readFile(file, {portal: state.portal});
+    return true;
+  }
+  async function startImport() {
+    if (!dialog || dialog.phase !== 'upload' || !dialog.file) return false;
+    const current = dialog, token = ++generation, portal = state.portal;
+    current.token = token; current.phase = 'validating'; current.busy = true; current.stage = '正在读取文件'; renderDialog();
+    const cancelled = () => dialog !== current || current.token !== token || generation !== token;
+    track('excel_import_validate_start');
+    const startedAt = Date.now();
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    if (cancelled()) return false;
+    const parsed = await readFile(current.file, {portal, cancelled, onProgress(stage) { if (!cancelled()) { current.stage = stage; renderDialog(); } }});
     if (dialog !== current || current.token !== token || generation !== token) return false;
-    current.busy = false; current.parsed = parsed; current.errors = parsed.errors; renderDialog();
+    current.busy = false; current.parsed = parsed; current.errors = parsed.errors; current.phase = parsed.ok ? 'ready' : 'invalid'; current.stage = parsed.ok ? '校验完成' : '校验失败'; renderDialog();
     track('excel_import_validate', {result: parsed.ok ? 'success' : 'failed', error_count: parsed.errors.length});
-    if (!parsed.ok) track('excel_import_result', {result: 'failed', error_code: 'validation', error_count: parsed.errors.length, question_count: 0, duration_ms: Date.now() - startedAt});
+    track(parsed.ok ? 'excel_import_validate_pass' : 'excel_import_validate_fail', {error_count: parsed.errors.length, duration_ms: Date.now() - startedAt});
     return parsed;
   }
-  function confirmImport() {
-    if (!dialog || dialog.busy || !dialog.parsed?.ok) return false;
+  function retryImport() {
+    if (!dialog || dialog.phase !== 'invalid') return false;
+    const trigger = dialog.trigger; track('excel_import_retry'); close('retry'); return open(trigger);
+  }
+  async function confirmImport() {
+    if (!dialog || dialog.phase !== 'ready' || !dialog.parsed?.ok) return false;
     const current = dialog;
     if (current.context !== `${state.portal}:${CONFIG[state.portal]?.org}:${CONFIG[state.portal]?.user}` || state.preview !== 'pc') { close('context_change'); return false; }
-    current.busy = true; renderDialog();
+    current.busy = true; current.phase = 'saving'; current.stage = '正在保存草稿'; renderDialog();
+    track('excel_import_confirm_save', {question_count: current.parsed.value.questions.length});
     const startedAt = Date.now();
     try {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      if (dialog !== current) return false;
       const survey = commitDraft(current.parsed);
       close('success'); location.hash = 'list/create'; renderShell();
       toast('导入成功，草稿已保存'); track('excel_import_result', {result: 'success', error_code: '', error_count: 0, duration_ms: Date.now() - startedAt, survey_id: survey.id, question_count: survey.questions.length}); return survey;
     } catch (error) {
-      current.busy = false; current.errors = [errorRow('保存', '', '', error.message || '草稿保存失败，请重试')]; renderDialog();
+      current.busy = false; current.phase = 'invalid'; current.stage = '保存失败'; current.errors = [errorRow('保存', '', '', error.message || '草稿保存失败，请重试')]; renderDialog();
       track('excel_import_result', {result: 'failed', reason: 'save', error_code: 'save', error_count: 1, question_count: current.parsed?.value?.questions?.length || 0, duration_ms: Date.now() - startedAt}); return false;
     }
   }
@@ -485,7 +517,7 @@
   }
   window.SurveyExcelV111 = {version: VERSION, MAX_BYTES, SHEETS, HEADERS, TEMPLATE_HEADERS, TYPES, parseWorkbook, parse: parseWorkbook,
     readFile, read: readFile, buildTemplateWorkbook, buildTemplateBytes, saveTemplateBytes, downloadTemplate, commitDraft, storageKey, persistAll, restorePersisted,
-    open, close, selectFile, confirmImport, install, getDialog: () => dialog};
+    open, close, selectFile, startImport, retryImport, confirmImport, install, getDialog: () => dialog};
   // Register after compatibility scripts; install after their DOMContentLoaded restores.
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install);
   else install();
