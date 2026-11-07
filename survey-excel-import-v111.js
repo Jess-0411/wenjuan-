@@ -3,6 +3,8 @@
   'use strict';
   const VERSION = 1, MAX_BYTES = 5 * 1024 * 1024;
   const SHEETS = ['基本信息', '问卷内容'];
+  const ORIGINAL_TEMPLATE_BASE64 = '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';
+  const FILE_STYLE_HEADERS = {基本信息: ['问卷名称(必填)', '问卷类型(必填)', '问卷说明'], 问卷内容: ['题目类型(必填)', '题目标题(必填)', '是否必填(必填)', '选项(必填)']};
   const HEADERS = {基本信息: ['字段', '内容'], 问卷内容: ['题号', '题型', '题目标题', '是否必填', '选项'], 填写说明: ['填写项目', '规则与示例']};
   const LEGACY_BASIC_HEADERS = ['字段', '内容', '填写要求', '填写示例（不导入）'];
   const LEGACY_TEMPLATE_HEADERS = ['题号（必填）', '题目类型（必填）', '题目标题（必填）', '是否必填（必填）', '选项（单选、多选必填）'];
@@ -166,8 +168,11 @@
     const portal = options.portal || state.portal, errors = [];
     if (!CONFIG[portal]) return {ok: false, errors: [errorRow('文件', '', '', '当前端不可用')]};
     if (macroWorkbook(book)) return {ok: false, errors: [errorRow('文件', '', '', '不支持含宏的 Excel 文件，请使用无宏模板')]};
-    if (!book || !Array.isArray(book.SheetNames) || ![2,3].includes(book.SheetNames.length) || new Set(book.SheetNames).size !== book.SheetNames.length || SHEETS.some(name => !book.SheetNames.includes(name) || !book.Sheets?.[name]) || book.SheetNames.some(name => ![...SHEETS,'填写说明'].includes(name))) {
+    if (!book || !Array.isArray(book.SheetNames) || ![2,3].includes(book.SheetNames.length) || new Set(book.SheetNames).size !== book.SheetNames.length || SHEETS.some(name => !book.SheetNames.includes(name) || !book.Sheets?.[name]) || book.SheetNames.some(name => ![...SHEETS,'填写说明','Sheet3'].includes(name))) {
       return {ok: false, errors: [errorRow('文件', '', '', '模板结构错误，必须包含“基本信息”“问卷内容”；兼容保留“填写说明”的旧版模版')]};
+    }
+    if (book.SheetNames.includes('Sheet3') && (!book.Sheets?.Sheet3 || Object.entries(book.Sheets.Sheet3).some(([address, cell]) => /^[A-Z]+[1-9][0-9]*$/.test(address) && (cell?.f || String(cell?.v ?? '').trim())))) {
+      errors.push(errorRow('Sheet3', '', '', '参考文件附带的 Sheet3 必须为空，请将问卷数据填写到指定工作表'));
     }
     if (book.SheetNames.includes('填写说明') && (!book.Sheets?.填写说明 || HEADERS.填写说明.some((value,index) => String(book.Sheets.填写说明[XLSX.utils.encode_cell({r:0,c:index})]?.v || '').trim() !== value))) {
       errors.push(errorRow('填写说明', 1, '表头', '旧版填写说明表头必须为填写项目、规则与示例'));
@@ -178,6 +183,28 @@
     SHEETS.forEach(name => {
       const headers = HEADERS[name];
       const sheet = book.Sheets[name], displayed = TEMPLATE_HEADERS[name];
+      const normalizeHeader = value => String(value ?? '').trim().replace(/（/g, '(').replace(/）/g, ')');
+      const fileStyle = FILE_STYLE_HEADERS[name].every((value, index) => normalizeHeader(sheet[XLSX.utils.encode_cell({r: 2, c: index})]?.v) === value);
+      if (fileStyle || String(sheet.A1?.v || '').trim() === '问卷导入模板') {
+        if (!fileStyle) errors.push(errorRow(name, 3, '表头', '请保留下载模板第3行表头及必填标识'));
+        const metadata = name === '基本信息' ? templateMetadataCells(book) : new Set();
+        metadata.add('A1'); metadata.add('A2');
+        const rows = readRows(sheet, name, FILE_STYLE_HEADERS[name].length, errors, metadata);
+        rows.filter(item => item.row < 3).forEach(item => errors.push(errorRow(name, item.row, '', '标题及填写须知区域仅允许左上角填写内容')));
+        const allowedMerges = name === '基本信息' ? ['A1:C1','A2:C2'] : ['A1:D1','A2:D2'];
+        if ((sheet['!merges'] || []).some(range => !allowedMerges.includes(XLSX.utils.encode_range(range)))) errors.push(errorRow(name, '', '', '仅允许标题行和填写须知行合并，表头及数据行不得合并'));
+        const content = rows.filter(item => item.row > 3);
+        if (name === '基本信息') {
+          basicLabels = ['问卷名称','问卷类型','问卷说明'];
+          if (content.length > 1) errors.push(errorRow(name, content[1].row, '', '基本信息仅允许填写一行数据'));
+          const entry = content[0] || {row: 4, values: []};
+          data[name] = basicLabels.map((field, index) => ({row: entry.row, values: [field, entry.values[index] || '']}));
+        } else {
+          columnOptions = false;
+          data[name] = content.map((entry, index) => ({row: entry.row, values: [String(index + 1), ...entry.values]}));
+        }
+        return;
+      }
       const matchesHeader = expected => expected.every((value, index) => String(sheet[XLSX.utils.encode_cell({r: 0, c: index})]?.v || '').trim() === value);
       const schemas = name === '基本信息' ? [LEGACY_BASIC_HEADERS, displayed, headers] : [displayed, LEGACY_COLUMN_HEADERS, LEGACY_TEMPLATE_HEADERS, headers];
       const accepted = schemas.find(matchesHeader);
@@ -218,7 +245,7 @@
       if (!['是', '否'].includes(requiredText)) errors.push(errorRow('问卷内容', row, '是否必填', '必须填写“是”或“否”'));
       const choice = ['单选', '多选'].includes(type), optionText = optionCells[0] || '';
       const lastOption = optionCells.reduce((last, value, index) => value ? index : last, -1);
-      const optionsList = columnOptions ? optionCells.slice(0, lastOption + 1) : optionText ? optionText.split(/\r?\n/).map(value => value.trim()) : [];
+      const optionsList = columnOptions ? optionCells.slice(0, lastOption + 1) : optionText ? optionText.split(/\r\n?|\n/).map(value => value.trim()) : [];
       const problem = typeof questionValidationError === 'function' ? questionValidationError(questionTitle, type, optionsList) : '';
       if (problem) errors.push(errorRow('问卷内容', row, choice && /选项/.test(problem) ? '选项' : '题目标题', problem));
       if (choice && columnOptions) optionsList.forEach((value, index) => {
@@ -240,100 +267,19 @@
     return {ok: true, errors: [], value: {...basicValue, questions}, basic: basicValue, questions};
   }
   function buildTemplateWorkbook(portal = state.portal) {
-    if (typeof XLSX === 'undefined') throw new Error('Excel 组件加载失败，请刷新后重试');
-    const currentTypes = CONFIG[portal]?.surveyTypes?.map(type => type.name).filter(Boolean) || [];
-    if (!currentTypes.length) throw new Error('当前端暂无有效问卷类型，请先维护问卷类型');
-    const examples = [
-      [1, '填空', '请填写您所在的教研组', '是', ''],
-      [2, '单选', '您最希望采用哪种培训方式？', '是', '线下集中培训', '线上直播培训', '自主学习'],
-      [3, '多选', '您希望参加哪些培训主题？（可多选）', '否', '课堂教学', '信息技术', '班级管理', '心理健康'],
-      [4, '日期', '您方便参加培训的日期', '否', ''],
-      [5, '文件/图片', '请上传相关培训需求材料', '否', ''],
-      [6, '签名', '请签字确认已阅读说明', '是', ''],
-      [7, '位置', '请选择您所在的省市区', '否', ''],
-    ];
-    const book = XLSX.utils.book_new(), basic = XLSX.utils.aoa_to_sheet([
-      TEMPLATE_HEADERS.基本信息,
-      ['问卷名称（必填）', '教师培训需求调查（示例）', '必填，1～50个字符；请修改为实际问卷名称。'],
-      ['问卷类型（必填）', currentTypes[0], '必填，请从本格下拉列表选择。'],
-      ['问卷说明', '此为默认示例问卷，请按实际需求修改或删除示例题目。', '最多500个字符，可留空。'],
-    ]);
-    const content = XLSX.utils.aoa_to_sheet([TEMPLATE_HEADERS.问卷内容, ...examples]);
-    content['!ref'] = 'A1:X101';
-    XLSX.utils.sheet_add_aoa(basic, [['问卷类型选项','题目类型选项','是否必填选项']], {origin: 'AA1'});
-    currentTypes.forEach((name, index) => XLSX.utils.sheet_add_aoa(basic, [[name]], {origin: `AA${index + 2}`}));
-    TYPES.forEach((name, index) => XLSX.utils.sheet_add_aoa(basic, [[name]], {origin: `AB${index + 2}`}));
-    XLSX.utils.sheet_add_aoa(basic, [['是'],['否']], {origin:'AC2'});
-    basic['!cols'] = [{wch: 25}, {wch: 43}, {wch: 45}, ...Array.from({length:26},()=>({hidden:true}))];
-    content['!cols'] = [{wch: 11}, {wch: 18}, {wch: 42}, {wch: 16}, ...Array.from({length:20},()=>({wch:20}))];
-    book.Workbook = {Names: [
-      {Name:'SurveyImportTypes',Ref:`'基本信息'!$AA$2:$AA$${currentTypes.length+1}`},
-      {Name:'SurveyQuestionTypes',Ref:"'基本信息'!$AB$2:$AB$8"},
-      {Name:'SurveyRequiredValues',Ref:"'基本信息'!$AC$2:$AC$3"},
-    ]};
-    [basic, content].forEach((sheet, index) => XLSX.utils.book_append_sheet(book, sheet, SHEETS[index]));
-    return book;
+    return XLSX.read(buildTemplateBytes(portal), {type: 'array', cellStyles: true});
   }
-  function buildTemplateBytes(portal = state.portal) {
-    // SheetJS CE omits native validations. Patch the resulting OOXML through its public ZIP API.
-    const book = buildTemplateWorkbook(portal), zip = XLSX.CFB.read(new Uint8Array(XLSX.write(book,{type:'array',bookType:'xlsx',compression:true})),{type:'array'});
-    const encoder = new TextEncoder(), decoder = new TextDecoder();
-    const read = path => { const file=XLSX.CFB.find(zip,`/${path}`);if(!file)throw new Error('模板生成失败，请重试');return decoder.decode(file.content); };
-    const write = (path,value) => XLSX.CFB.utils.cfb_add(zip,`/${path}`,encoder.encode(value));
-    const xml = value => String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[char]));
-    const emphasizeRequired = (source, sheet) => source.replace(/<c\b([^>]*[^/>])>[\s\S]*?<\/c>/g, (cell, attrs) => {
-      const address = attrs.match(/\br="([A-Z]+[0-9]+)"/)?.[1], value = sheet[address]?.v;
-      if (typeof value !== 'string') return cell;
-      const ranges = [];
-      for (const match of value.matchAll(/[（(]([^）)]*)[）)]/g)) {
-        if (match[1].includes('非必填')) continue;
-        for (const required of match[1].matchAll(/必填/g)) ranges.push(match.index + 1 + required.index);
-      }
-      if (!ranges.length) return cell;
-      const bold = /\bs="1"/.test(attrs) ? '<b/>' : '';
-      const run = (text,color) => `<r><rPr><rFont val="Microsoft YaHei"/>${bold}<sz val="11"/><color rgb="${color}"/></rPr><t xml:space="preserve">${xml(text)}</t></r>`;
-      let position = 0, runs = '';
-      ranges.forEach(start => { if (start > position) runs += run(value.slice(position,start),'FF000000'); runs += run(value.slice(start,start+2),'FFFF0000'); position = start + 2; });
-      if (position < value.length) runs += run(value.slice(position),'FF000000');
-      return `<c${attrs.replace(/\st="[^"]*"/g,'')} t="inlineStr"><is>${runs}</is></c>`;
-    });
-    const validation = (range,formula,prompt) => `<dataValidation type="list" errorStyle="stop" allowBlank="1" showDropDown="0" showInputMessage="1" showErrorMessage="1" promptTitle="下拉选择" prompt="${xml(prompt)}" errorTitle="选项无效" error="请从下拉列表选择有效值。" sqref="${range}"><formula1>${xml(formula)}</formula1></dataValidation>`;
-    const applyStyle = (source, sheetIndex) => {
-      source=source.replace(/<row\b([^>]*)>([\s\S]*?)<\/row>/g,(_,attrs,cells)=>{
-        const row=Number(attrs.match(/\br="([0-9]+)"/)?.[1]||0),height=row===1?48:sheetIndex===2?48:row<=4?64:20;
-        attrs=attrs.replace(/\s(?:ht|customHeight)="[^"]*"/g,'');
-        cells=cells.replace(/<c\b([^>]*?)(\/>|>)/g,(__,cellAttrs,end)=>{
-          const column=cellAttrs.match(/\br="([A-Z]+)[0-9]+"/)?.[1]||'',header=row===1;
-          let style=header?1:4;
-          if(sheetIndex===1)style=header?1:column==='B'?3:column==='A'?(row===4?6:2):4;
-          if(sheetIndex===2&&!header)style=3;
-          return `<c${cellAttrs.replace(/\ss="[^"]*"/g,'')} s="${style}"${end}`;
-        });
-        if(sheetIndex===1&&row>=2&&row<=4&&!new RegExp(`r="B${row}"`).test(cells))cells=cells.replace(/(<c\b[^>]*\br="A[0-9]+"[^>]*>[\s\S]*?<\/c>)/,`$1<c r="B${row}" s="3"/>`);
-        return `<row${attrs} ht="${height}" customHeight="1">${cells}</row>`;
-      });
-      if(sheetIndex===2){const present=new Set([...source.matchAll(/<row\b[^>]*\br="([0-9]+)"/g)].map(match=>Number(match[1])));const blanks=Array.from({length:100},(_,index)=>index+2).filter(row=>!present.has(row)).map(row=>`<row r="${row}" ht="32" customHeight="1">${Array.from({length:24},(_,index)=>`<c r="${XLSX.utils.encode_col(index)}${row}" s="3"/>`).join('')}</row>`).join('');source=source.replace('</sheetData>',`${blanks}</sheetData>`);}
-      const views=`<sheetViews><sheetView workbookViewId="0" showGridLines="1">${sheetIndex===2?'<pane xSplit="4" ySplit="1" topLeftCell="E2" activePane="bottomRight" state="frozen"/><selection pane="bottomRight" activeCell="E2" sqref="E2"/>':''}</sheetView></sheetViews>`;
-      source=/<sheetViews>/.test(source)?source.replace(/<sheetViews>[\s\S]*?<\/sheetViews>/,views):source.replace(/(<dimension\b[^>]*\/>)/,`$1${views}`);
-      const rules=sheetIndex===1?validation('B3','SurveyImportTypes','必填，请选择当前端有效问卷类型。'):sheetIndex===2?validation('B2:B101',`"${TYPES.join(',')}"`,'必填，请选择题目类型。')+validation('D2:D101','"是,否"','必填：“是”为必答题，“否”为非必答题。'):'';
-      return rules?source.replace('</sheetData>',`</sheetData><dataValidations count="${sheetIndex===1?1:2}">${rules}</dataValidations>`):source;
-    };
-    [1,2].forEach(index=>{const path=`xl/worksheets/sheet${index}.xml`;write(path,emphasizeRequired(applyStyle(read(path),index),book.Sheets[SHEETS[index-1]]));});
-    const alignment='<alignment vertical="center" wrapText="1"/>';
-    const fonts=[false,true].map(bold=>`<font>${bold?'<b/>':''}<sz val="11"/><color rgb="FF000000"/><name val="Microsoft YaHei"/><family val="2"/></font>`).join('');
-    // Excel reserves fill 0/1 for none/gray125. Every authored cell uses fill 0.
-    const fills='<fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>';
-    const styles=[0,1,0,0,0,0,0].map(font=>`<xf numFmtId="0" fontId="${font}" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">${alignment}</xf>`).join('');
-    write('xl/styles.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2">${fonts}</fonts><fills count="2">${fills}</fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="7">${styles}</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`);
-    return new Uint8Array(XLSX.CFB.write(zip,{type:'array',fileType:'zip',compression:true}));
+  function buildTemplateBytes() {
+    // Return the user's original workbook byte for byte. Do not rebuild or patch it.
+    return Uint8Array.from(atob(ORIGINAL_TEMPLATE_BASE64), character => character.charCodeAt(0));
   }
   function saveTemplateBytes(bytes) {
     const blob=new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),url=URL.createObjectURL(blob),link=document.createElement('a');
-    link.href=url;link.download='问卷导入模版.xlsx';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);return true;
+    link.href=url;link.download='问卷调研模板.xlsx';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);return true;
   }
   function downloadTemplate() {
     if (state.preview !== 'pc') return false;
-    try { saveTemplateBytes(buildTemplateBytes()); track('excel_template_download', {result: 'success', template_version:'V1.16'}); return true; }
+    try { saveTemplateBytes(buildTemplateBytes()); track('excel_template_download', {result: 'success', template_version:'original-file-1'}); return true; }
     catch (error) { track('excel_template_download', {result: 'failed'}); toast(error.message || '模板下载失败，请重试'); return false; }
   }
   async function readFile(file, options = {}) {
@@ -515,7 +461,7 @@
     window.addEventListener('hashchange', () => { if (dialog) close('route_change'); if (location.hash !== '#list/create') creationSessionId = null; });
     if (document.documentElement?.dataset) document.documentElement.dataset.surveyExcelImport = 'v111';
   }
-  window.SurveyExcelV111 = {version: VERSION, MAX_BYTES, SHEETS, HEADERS, TEMPLATE_HEADERS, TYPES, parseWorkbook, parse: parseWorkbook,
+  window.SurveyExcelV111 = {version: VERSION, MAX_BYTES, SHEETS, HEADERS, TEMPLATE_HEADERS, FILE_STYLE_HEADERS, TYPES, parseWorkbook, parse: parseWorkbook,
     readFile, read: readFile, buildTemplateWorkbook, buildTemplateBytes, saveTemplateBytes, downloadTemplate, commitDraft, storageKey, persistAll, restorePersisted,
     open, close, selectFile, startImport, retryImport, confirmImport, install, getDialog: () => dialog};
   // Register after compatibility scripts; install after their DOMContentLoaded restores.
